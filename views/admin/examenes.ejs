@@ -1,0 +1,288 @@
+<!-- Exámenes CRUD -->
+<div class="hidden lg:block mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Exámenes</h1>
+      <p class="text-slate-500 mt-1">Gestiona los exámenes de aptitud y conocimientos</p>
+    </div>
+    <button onclick="document.getElementById('modal-crear').classList.remove('hidden')" class="btn-primary">
+      <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+      Nuevo Examen
+    </button>
+  </div>
+</div>
+
+<div class="lg:hidden mb-4">
+  <button onclick="document.getElementById('modal-crear').classList.remove('hidden')" class="btn-primary w-full">
+    <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+    Nuevo Examen
+  </button>
+</div>
+
+<!-- Stat Cards -->
+<%
+  const totalExamenes = examenes.length;
+  const totalAptitud = examenes.filter(e => e.tipo === 'aptitud').length;
+  const totalConocimientos = examenes.filter(e => e.tipo === 'conocimientos').length;
+  const totalResultados = examenes.reduce((s, e) => s + (e.resultados ? e.resultados.length : 0), 0);
+%>
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+  <div class="card-static !p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500">Total</p>
+        <p class="text-xl font-extrabold text-slate-800"><%= totalExamenes %></p>
+      </div>
+    </div>
+  </div>
+  <div class="card-static !p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500">Aptitud</p>
+        <p class="text-xl font-extrabold text-blue-700"><%= totalAptitud %></p>
+      </div>
+    </div>
+  </div>
+  <div class="card-static !p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500">Conocimientos</p>
+        <p class="text-xl font-extrabold text-emerald-700"><%= totalConocimientos %></p>
+      </div>
+    </div>
+  </div>
+  <div class="card-static !p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500">Resultados</p>
+        <p class="text-xl font-extrabold text-purple-700"><%= totalResultados %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lista de exámenes -->
+<div class="card-static">
+  <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-2">
+      <div class="icon-box bg-primary-100 text-primary-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <div>
+        <h2 class="section-title">Listado de Exámenes</h2>
+        <p class="text-xs text-slate-400"><%= totalExamenes %> examen(es) registrado(s)</p>
+      </div>
+    </div>
+  </div>
+
+  <% if (examenes.length === 0) { %>
+  <div class="text-center py-16">
+    <div class="icon-box bg-primary-100 text-primary-300 mx-auto mb-4 w-16 h-16 rounded-2xl">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    </div>
+    <p class="text-sm font-medium text-slate-500">No hay exámenes registrados</p>
+    <p class="text-xs text-slate-400 mt-1">Crea el primer examen para comenzar</p>
+  </div>
+  <% } else { %>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="table-header">Examen</th>
+          <th class="table-header">Fecha</th>
+          <th class="table-header text-center">Preguntas</th>
+          <th class="table-header text-center">Resultados</th>
+          <th class="table-header text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% examenes.forEach(function(examen) {
+          const numResultados = examen.resultados ? examen.resultados.length : 0;
+        %>
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="table-cell">
+            <div class="flex items-center gap-3">
+              <% if (examen.tipo === 'aptitud') { %>
+              <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              </div>
+              <% } else { %>
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+              </div>
+              <% } %>
+              <div>
+                <p class="font-semibold text-slate-800 text-sm"><%= examen.descripcion || (examen.tipo === 'aptitud' ? 'Examen de Aptitud' : 'Examen de Conocimientos') %></p>
+                <% if (examen.tipo === 'aptitud') { %>
+                <span class="badge-blue text-[11px]">Aptitud</span>
+                <% } else { %>
+                <span class="badge-green text-[11px]">Conocimientos</span>
+                <% } %>
+              </div>
+            </div>
+          </td>
+          <td class="table-cell">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span class="text-sm font-medium text-slate-700"><%= new Date(examen.fecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) %></span>
+            </div>
+          </td>
+          <td class="table-cell text-center">
+            <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 text-slate-700 text-sm font-bold"><%= examen.total_preguntas %></span>
+          </td>
+          <td class="table-cell text-center">
+            <% if (numResultados > 0) { %>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-semibold">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <%= numResultados %>
+            </span>
+            <% } else { %>
+            <span class="text-xs text-slate-400">Sin resultados</span>
+            <% } %>
+          </td>
+          <td class="table-cell text-right">
+            <div class="flex items-center justify-end gap-1">
+              <button onclick='abrirEditarExamen(<%- JSON.stringify({id: examen.id, tipo: examen.tipo, fecha: examen.fecha, total_preguntas: examen.total_preguntas, descripcion: examen.descripcion || ""}) %>)' class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-primary-700 bg-primary-50 hover:bg-primary-100 transition-colors" title="Editar">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Editar
+              </button>
+              <form action="/admin/examenes/<%= examen.id %>/delete" method="POST" class="inline" onsubmit="return confirm('¿Eliminar este examen y todos sus resultados asociados?')">
+                <button type="submit" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 transition-colors" title="Eliminar">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  Eliminar
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<!-- Modal Crear Examen -->
+<div id="modal-crear" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('modal-crear').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-in">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="icon-box bg-primary-100 text-primary-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+      </div>
+      <div class="flex-1">
+        <h2 class="text-lg font-bold text-slate-800">Nuevo Examen</h2>
+        <p class="text-xs text-slate-400">Registrar un nuevo examen de simulacro</p>
+      </div>
+      <button onclick="document.getElementById('modal-crear').classList.add('hidden')" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form action="/admin/examenes" method="POST" class="space-y-4">
+      <div>
+        <label class="input-label">Tipo de examen *</label>
+        <select name="tipo" class="input-field" required onchange="ajustarPreguntas(this.value, 'crear-preguntas')">
+          <option value="">Seleccionar...</option>
+          <option value="aptitud">📘 Aptitud</option>
+          <option value="conocimientos">📗 Conocimientos</option>
+        </select>
+      </div>
+      <div>
+        <label class="input-label">Fecha *</label>
+        <input type="date" name="fecha" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">Total de preguntas *</label>
+        <input type="number" name="total_preguntas" id="crear-preguntas" class="input-field" min="1" required>
+        <p class="text-[11px] text-slate-400 mt-1.5">Aptitud: 40 preguntas | Conocimientos: 50 preguntas</p>
+      </div>
+      <div>
+        <label class="input-label">Descripción</label>
+        <input type="text" name="descripcion" class="input-field" placeholder="Ej: Simulacro Nro 3">
+      </div>
+      <div class="flex gap-3 pt-3 border-t border-slate-100">
+        <button type="submit" class="btn-primary flex-1">
+          <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Crear Examen
+        </button>
+        <button type="button" onclick="document.getElementById('modal-crear').classList.add('hidden')" class="btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Editar Examen -->
+<div id="modal-editar" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="fixed inset-0 bg-black/50 backdrop-blur-sm" onclick="document.getElementById('modal-editar').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-2xl shadow-xl max-w-md w-full p-6 animate-in">
+    <div class="flex items-center gap-3 mb-6">
+      <div class="icon-box bg-gold-100 text-gold-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+      </div>
+      <div class="flex-1">
+        <h2 class="text-lg font-bold text-slate-800">Editar Examen</h2>
+        <p class="text-xs text-slate-400">Modificar datos del examen</p>
+      </div>
+      <button onclick="document.getElementById('modal-editar').classList.add('hidden')" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form id="form-editar-examen" method="POST" class="space-y-4">
+      <div>
+        <label class="input-label">Tipo de examen *</label>
+        <select name="tipo" id="ee-tipo" class="input-field" required>
+          <option value="aptitud">📘 Aptitud</option>
+          <option value="conocimientos">📗 Conocimientos</option>
+        </select>
+      </div>
+      <div>
+        <label class="input-label">Fecha *</label>
+        <input type="date" name="fecha" id="ee-fecha" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">Total de preguntas *</label>
+        <input type="number" name="total_preguntas" id="ee-preguntas" class="input-field" min="1" required>
+      </div>
+      <div>
+        <label class="input-label">Descripción</label>
+        <input type="text" name="descripcion" id="ee-desc" class="input-field" placeholder="Ej: Simulacro Nro 3">
+      </div>
+      <div class="flex gap-3 pt-3 border-t border-slate-100">
+        <button type="submit" class="btn-gold flex-1">
+          <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Guardar Cambios
+        </button>
+        <button type="button" onclick="document.getElementById('modal-editar').classList.add('hidden')" class="btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function ajustarPreguntas(tipo, inputId) {
+  const input = document.getElementById(inputId);
+  if (tipo === 'aptitud') input.value = 40;
+  else if (tipo === 'conocimientos') input.value = 50;
+}
+
+function abrirEditarExamen(data) {
+  document.getElementById('form-editar-examen').action = '/admin/examenes/' + data.id + '/update';
+  document.getElementById('ee-tipo').value = data.tipo;
+  document.getElementById('ee-fecha').value = data.fecha ? data.fecha.substring(0, 10) : '';
+  document.getElementById('ee-preguntas').value = data.total_preguntas;
+  document.getElementById('ee-desc').value = data.descripcion;
+  document.getElementById('modal-editar').classList.remove('hidden');
+}
+</script>

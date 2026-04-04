@@ -1,0 +1,115 @@
+<!-- Configuración -->
+<div class="hidden lg:block mb-8">
+  <h1 class="text-2xl font-bold text-slate-800">Configuración</h1>
+  <p class="text-slate-500 mt-1">Parámetros generales del sistema</p>
+</div>
+
+<form method="POST" action="/admin/configuracion">
+  <div class="space-y-6">
+
+    <!-- Datos generales -->
+    <div class="card">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        </div>
+        <div>
+          <h2 class="text-base font-semibold text-slate-800">Datos de la Institución</h2>
+          <p class="text-xs text-slate-400">Información general del colegio y año académico</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <% grupos.general.forEach(function(c) { %>
+        <div>
+          <label for="<%= c.clave %>" class="input-label"><%= c.descripcion %></label>
+          <input type="text" id="<%= c.clave %>" name="<%= c.clave %>" value="<%= c.valor %>" class="input-field">
+        </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Calificación -->
+    <div class="card">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        </div>
+        <div>
+          <h2 class="text-base font-semibold text-slate-800">Parámetros de Calificación</h2>
+          <p class="text-xs text-slate-400">Puntuaciones utilizadas en el cálculo de notas</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <% grupos.calificacion.forEach(function(c) { %>
+        <div>
+          <label for="<%= c.clave %>" class="input-label"><%= c.descripcion %></label>
+          <input type="number" step="any" id="<%= c.clave %>" name="<%= c.clave %>" value="<%= c.valor %>" class="input-field">
+        </div>
+        <% }); %>
+      </div>
+      <div class="mt-4 p-3 rounded-lg bg-blue-50 border border-blue-100">
+        <p class="text-xs text-blue-700">
+          <strong>Fórmula actual:</strong> puntaje_bruto = (correctas × puntaje_correcta) + (incorrectas × penalización) + (en_blanco × puntaje_blanco)<br>
+          nota_vigesimal = (puntaje_bruto / total_preguntas) × 20
+        </p>
+      </div>
+    </div>
+
+    <!-- Alertas -->
+    <div class="card">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-lg bg-yellow-50 text-yellow-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div>
+          <h2 class="text-base font-semibold text-slate-800">Alertas Pedagógicas</h2>
+          <p class="text-xs text-slate-400">Umbrales para generar alertas de bajo rendimiento</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <% grupos.alertas.forEach(function(c) { %>
+        <div>
+          <label for="<%= c.clave %>" class="input-label"><%= c.descripcion %></label>
+          <input type="number" step="any" id="<%= c.clave %>" name="<%= c.clave %>" value="<%= c.valor %>" class="input-field">
+        </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Visibilidad -->
+    <div class="card">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        </div>
+        <div>
+          <h2 class="text-base font-semibold text-slate-800">Visibilidad</h2>
+          <p class="text-xs text-slate-400">Controlar qué información pueden ver estudiantes y padres</p>
+        </div>
+      </div>
+      <div class="space-y-4">
+        <% grupos.visibilidad.forEach(function(c) { %>
+        <label class="flex items-center gap-3 cursor-pointer group">
+          <div class="relative">
+            <input type="hidden" name="<%= c.clave %>" value="">
+            <input type="checkbox" name="<%= c.clave %>" value="true" <%= c.valor === 'true' ? 'checked' : '' %>
+              class="w-5 h-5 rounded border-slate-300 text-primary-600 focus:ring-primary-500 focus:ring-2 transition-colors">
+          </div>
+          <div>
+            <span class="text-sm font-medium text-slate-700 group-hover:text-slate-900"><%= c.descripcion %></span>
+          </div>
+        </label>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Botón guardar -->
+    <div class="flex items-center justify-end gap-3">
+      <a href="/admin" class="btn-secondary">Cancelar</a>
+      <button type="submit" class="btn-primary flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        Guardar Configuración
+      </button>
+    </div>
+  </div>
+</form>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — PIU Mariátegui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="min-h-screen bg-slate-50">
+  <div class="flex min-h-screen">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-30 w-64 bg-gradient-to-b from-primary-950 to-primary-900 transform transition-transform duration-200 lg:translate-x-0 -translate-x-full">
+      <div class="flex flex-col h-full">
+        <!-- Logo -->
+        <div class="flex items-center gap-3 px-6 py-5 border-b border-white/10">
+          <img src="/img/logo-blanco.png" alt="PIU Mariátegui" class="w-9 h-9 rounded-lg object-contain">
+          <div>
+            <span class="text-sm font-semibold text-white">PIU Mariátegui</span>
+            <span class="block text-xs text-primary-300">Estudiante</span>
+          </div>
+        </div>
+
+        <!-- Nav links -->
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <a href="/estudiante" class="<%= currentPage === 'dashboard' ? 'sidebar-link-active' : 'sidebar-link' %>">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            Dashboard
+          </a>
+          <a href="/estudiante/examenes" class="<%= currentPage === 'examenes' ? 'sidebar-link-active' : 'sidebar-link' %>">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            Mis Exámenes
+          </a>
+          <a href="/estudiante/evolucion" class="<%= currentPage === 'evolucion' ? 'sidebar-link-active' : 'sidebar-link' %>">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            Evolución
+          </a>
+          <a href="/estudiante/rankings" class="<%= currentPage === 'rankings' ? 'sidebar-link-active' : 'sidebar-link' %>">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            Rankings
+          </a>
+          <a href="/estudiante/simulacion" class="<%= currentPage === 'simulacion' ? 'sidebar-link-active' : 'sidebar-link' %>">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+            Simulación Admisión
+          </a>
+          <a href="/estudiante/promedios" class="<%= currentPage === 'promedios' ? 'sidebar-link-active' : 'sidebar-link' %>">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+            Promedios
+          </a>
+
+          <div class="pt-3 mt-3 border-t border-white/10">
+            <a href="/estudiante/cambiar-carrera" class="<%= currentPage === 'cambiar-carrera' ? 'sidebar-link-active' : 'sidebar-link' %>">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Cambiar Área/Carrera
+            </a>
+          </div>
+        </nav>
+
+        <!-- User info -->
+        <div class="px-4 py-4 border-t border-white/10">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/15 text-white flex items-center justify-center text-sm font-semibold">
+              <%= user.nombre.charAt(0).toUpperCase() %>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-white truncate"><%= user.nombre %></p>
+              <p class="text-xs text-primary-300">Estudiante</p>
+            </div>
+            <form action="/logout" method="POST">
+              <button type="submit" class="text-primary-300 hover:text-red-400 transition-colors" title="Cerrar sesión">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Overlay mobile -->
+    <div id="sidebar-overlay" class="fixed inset-0 z-20 bg-black/50 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col min-h-screen lg:ml-64">
+      <!-- Top bar (mobile) -->
+      <header class="sticky top-0 z-10 bg-white border-b border-slate-200 px-4 py-3 flex items-center gap-4 lg:hidden">
+        <button onclick="toggleSidebar()" class="text-slate-600 hover:text-slate-800" aria-label="Abrir menú">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <h1 class="text-lg font-semibold text-slate-800"><%= title %></h1>
+      </header>
+
+      <!-- Page content -->
+      <main class="flex-1 p-4 lg:p-8">
+        <% if (locals.success) { %>
+        <div class="mb-6 p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm" role="alert">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            <%= success %>
+          </div>
+        </div>
+        <% } %>
+        <% if (locals.error) { %>
+        <div class="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm" role="alert">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+            <%= error %>
+          </div>
+        </div>
+        <% } %>
+
+        <%- body %>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+    }
+  </script>
+  <%- script %>
+</body>
+</html>

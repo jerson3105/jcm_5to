@@ -1,0 +1,462 @@
+<!-- Resultados — Carga y consulta -->
+<div class="hidden lg:block mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Resultados de Exámenes</h1>
+      <p class="text-slate-500 mt-1">Carga individual o masiva de resultados y consulta por examen</p>
+    </div>
+    <% if (examenActual && resultados.length > 0) { %>
+    <div class="flex items-center gap-2">
+      <span class="badge-indigo text-xs">
+        <%= examenActual.tipo === 'aptitud' ? 'Aptitud' : 'Conocimientos' %>
+      </span>
+      <span class="badge text-xs">
+        <%= new Date(examenActual.fecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+      </span>
+      <span class="badge text-xs"><%= examenActual.total_preguntas %> preguntas</span>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Errores de importación -->
+<% if (locals.importErrors && importErrors && importErrors.length > 0) { %>
+<div class="mb-6 p-4 rounded-xl bg-gold-50 border border-gold-200 text-gold-800 text-sm">
+  <div class="flex items-center gap-2 mb-2">
+    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+    <strong>Filas con errores en la importación:</strong>
+  </div>
+  <ul class="list-disc list-inside ml-6 space-y-1">
+    <% importErrors.forEach(err => { %>
+    <li>Fila <%= err.fila %> (DNI: <%= err.dni %>): <%= err.error %></li>
+    <% }) %>
+  </ul>
+</div>
+<% } %>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+  <!-- Panel lateral: selección de examen + carga -->
+  <div class="lg:col-span-1 space-y-4">
+
+    <!-- Seleccionar examen -->
+    <div class="card-static">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="icon-box bg-primary-100 text-primary-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        </div>
+        <h2 class="section-title">Seleccionar Examen</h2>
+      </div>
+      <form action="/admin/resultados" method="GET">
+        <select name="examen_id" class="input-field text-sm" onchange="this.form.submit()">
+          <option value="">— Elegir examen —</option>
+          <% examenes.forEach(ex => { %>
+          <option value="<%= ex.id %>" <%= examenActual && examenActual.id === ex.id ? 'selected' : '' %>>
+            <%= ex.tipo === 'aptitud' ? '📘 Aptitud' : '📗 Conoc.' %> — <%= new Date(ex.fecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+            <% if (ex.descripcion) { %> (<%= ex.descripcion %>) <% } %>
+          </option>
+          <% }) %>
+        </select>
+      </form>
+
+      <% if (examenActual) { %>
+      <div class="mt-4 p-3 bg-primary-50/50 rounded-xl space-y-2">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-500">Tipo</span>
+          <span class="font-semibold text-primary-700"><%= examenActual.tipo === 'aptitud' ? 'Aptitud' : 'Conocimientos' %></span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-500">Fecha</span>
+          <span class="font-semibold text-slate-700"><%= new Date(examenActual.fecha).toLocaleDateString('es-PE') %></span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-500">Preguntas</span>
+          <span class="font-semibold text-slate-700"><%= examenActual.total_preguntas %></span>
+        </div>
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-500">Resultados</span>
+          <span class="font-bold text-primary-600"><%= resultados.length %></span>
+        </div>
+        <% if (examenActual.descripcion) { %>
+        <div class="border-t border-primary-100 pt-2">
+          <p class="text-xs text-slate-500 italic"><%= examenActual.descripcion %></p>
+        </div>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
+
+    <% if (examenActual) { %>
+    <!-- Carga individual -->
+    <div class="card-static">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="icon-box bg-emerald-100 text-emerald-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        </div>
+        <h2 class="section-title">Carga Individual</h2>
+      </div>
+      <form action="/admin/resultados" method="POST" class="space-y-3">
+        <input type="hidden" name="examen_id" value="<%= examenActual.id %>">
+        <div>
+          <label class="input-label">Estudiante *</label>
+          <select name="estudiante_id" class="input-field text-sm" required>
+            <option value="">Seleccionar...</option>
+            <% estudiantes.forEach(est => { %>
+            <option value="<%= est.id %>"><%= est.usuario.nombre %> (<%= est.dni %>) — <%= est.seccion ? est.seccion.nombre : '' %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="input-label text-center">C</label>
+            <input type="number" name="correctas" class="input-field text-sm text-center" min="0" max="<%= examenActual.total_preguntas %>" value="0" required>
+          </div>
+          <div>
+            <label class="input-label text-center">I</label>
+            <input type="number" name="incorrectas" class="input-field text-sm text-center" min="0" max="<%= examenActual.total_preguntas %>" value="0" required>
+          </div>
+          <div>
+            <label class="input-label text-center">B</label>
+            <input type="number" name="en_blanco" class="input-field text-sm text-center" min="0" max="<%= examenActual.total_preguntas %>" value="0" required>
+          </div>
+        </div>
+        <button type="submit" class="btn-success w-full text-sm">
+          <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          Registrar Resultado
+        </button>
+      </form>
+    </div>
+
+    <!-- Carga masiva -->
+    <div class="card-static">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="icon-box bg-sky-100 text-sky-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        </div>
+        <h2 class="section-title">Carga Masiva</h2>
+      </div>
+      <form action="/admin/resultados/importar" method="POST" enctype="multipart/form-data" class="space-y-3">
+        <input type="hidden" name="examen_id" value="<%= examenActual.id %>">
+        <div>
+          <input type="file" name="archivo" accept=".xlsx,.xls,.csv" class="block w-full text-sm text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100" required>
+        </div>
+        <button type="submit" class="btn-primary w-full text-sm">
+          <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          Importar Archivo
+        </button>
+      </form>
+      <div class="mt-3 p-3 bg-slate-50 rounded-xl">
+        <p class="text-xs font-medium text-slate-600 mb-1">Formato esperado:</p>
+        <div class="overflow-x-auto">
+          <table class="text-xs text-slate-500 w-full">
+            <thead><tr><th class="text-left pr-2 text-slate-600">dni</th><th class="text-left pr-2 text-slate-600">correctas</th><th class="text-left pr-2 text-slate-600">incorrectas</th><th class="text-left text-slate-600">en_blanco</th></tr></thead>
+            <tbody><tr><td class="pr-2 font-mono">72345678</td><td class="pr-2">25</td><td class="pr-2">10</td><td>5</td></tr></tbody>
+          </table>
+        </div>
+        <p class="text-xs text-slate-400 mt-2">Si el DNI ya tiene resultado, se actualizará.</p>
+      </div>
+    </div>
+    <% } %>
+
+  </div>
+
+  <!-- Tabla de resultados -->
+  <div class="lg:col-span-3">
+    <% if (!examenActual) { %>
+    <div class="card-static text-center py-16">
+      <div class="icon-box bg-primary-100 text-primary-300 mx-auto mb-4 w-16 h-16 rounded-2xl">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <p class="text-sm font-medium text-slate-500">Selecciona un examen para ver sus resultados</p>
+      <p class="text-xs text-slate-400 mt-1">Elige uno del panel lateral izquierdo</p>
+    </div>
+    <% } else if (resultados.length === 0) { %>
+    <div class="card-static text-center py-16">
+      <div class="icon-box bg-slate-100 text-slate-300 mx-auto mb-4 w-16 h-16 rounded-2xl">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <p class="text-sm font-medium text-slate-500">No hay resultados para este examen</p>
+      <p class="text-xs text-slate-400 mt-1">Usa la carga individual o importa un archivo Excel/CSV</p>
+    </div>
+    <% } else { %>
+    <%
+      const notas = resultados.map(r => parseFloat(r.nota_vigesimal));
+      const promedio = notas.reduce((a, b) => a + b, 0) / notas.length;
+      const maxNota = Math.max(...notas);
+      const minNota = Math.min(...notas);
+      const aprobados = notas.filter(n => n >= 10.5).length;
+      const pctAprobados = Math.round((aprobados / notas.length) * 100);
+      const rango0_5 = notas.filter(n => n < 5).length;
+      const rango5_10 = notas.filter(n => n >= 5 && n < 10).length;
+      const rango10_15 = notas.filter(n => n >= 10 && n < 15).length;
+      const rango15_20 = notas.filter(n => n >= 15).length;
+      const secciones = [...new Set(resultados.map(r => r.estudiante.seccion ? r.estudiante.seccion.nombre : ''))].filter(Boolean).sort();
+    %>
+
+    <!-- Estadísticas -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      <div class="card-static !p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">Promedio</p>
+            <p class="text-xl font-extrabold text-primary-700"><%= promedio.toFixed(1) %></p>
+          </div>
+        </div>
+      </div>
+      <div class="card-static !p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">Máxima</p>
+            <p class="text-xl font-extrabold text-emerald-700"><%= maxNota.toFixed(1) %></p>
+          </div>
+        </div>
+      </div>
+      <div class="card-static !p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">Mínima</p>
+            <p class="text-xl font-extrabold text-red-600"><%= minNota.toFixed(1) %></p>
+          </div>
+        </div>
+      </div>
+      <div class="card-static !p-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gold-100 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <div>
+            <p class="text-xs text-slate-500">Aprobados</p>
+            <p class="text-xl font-extrabold text-gold-700"><%= aprobados %>/<%= notas.length %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de aprobación + distribución -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
+      <!-- Tasa de aprobación -->
+      <div class="card-static !p-4">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs font-semibold text-slate-600">Tasa de aprobación (≥ 10.5)</p>
+          <span class="text-sm font-extrabold <%= pctAprobados >= 50 ? 'text-emerald-600' : 'text-red-500' %>"><%= pctAprobados %>%</span>
+        </div>
+        <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+          <% if (pctAprobados >= 50) { %>
+          <div class="h-full rounded-full bg-emerald-500" style="width: <%= pctAprobados %>%"></div>
+          <% } else { %>
+          <div class="h-full rounded-full bg-red-500" style="width: <%= pctAprobados %>%"></div>
+          <% } %>
+        </div>
+        <div class="flex justify-between mt-1.5 text-xs text-slate-400">
+          <span><%= aprobados %> aprobados</span>
+          <span><%= notas.length - aprobados %> desaprobados</span>
+        </div>
+      </div>
+      <!-- Distribución de notas -->
+      <div class="card-static !p-4">
+        <p class="text-xs font-semibold text-slate-600 mb-3">Distribución de notas</p>
+        <% const maxRango = Math.max(rango0_5, rango5_10, rango10_15, rango15_20, 1); %>
+        <div class="flex items-end gap-2 h-16 mb-2">
+          <div class="flex-1 h-full flex items-end">
+            <div class="w-full bg-red-400 rounded-t-md" style="height: <%= Math.max((rango0_5 / maxRango) * 100, 8) %>%"></div>
+          </div>
+          <div class="flex-1 h-full flex items-end">
+            <div class="w-full bg-orange-400 rounded-t-md" style="height: <%= Math.max((rango5_10 / maxRango) * 100, 8) %>%"></div>
+          </div>
+          <div class="flex-1 h-full flex items-end">
+            <div class="w-full bg-sky-400 rounded-t-md" style="height: <%= Math.max((rango10_15 / maxRango) * 100, 8) %>%"></div>
+          </div>
+          <div class="flex-1 h-full flex items-end">
+            <div class="w-full bg-emerald-400 rounded-t-md" style="height: <%= Math.max((rango15_20 / maxRango) * 100, 8) %>%"></div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <div class="flex-1 text-center">
+            <p class="text-[10px] text-slate-400">0-5</p>
+            <p class="text-xs font-bold text-slate-600"><%= rango0_5 %></p>
+          </div>
+          <div class="flex-1 text-center">
+            <p class="text-[10px] text-slate-400">5-10</p>
+            <p class="text-xs font-bold text-slate-600"><%= rango5_10 %></p>
+          </div>
+          <div class="flex-1 text-center">
+            <p class="text-[10px] text-slate-400">10-15</p>
+            <p class="text-xs font-bold text-slate-600"><%= rango10_15 %></p>
+          </div>
+          <div class="flex-1 text-center">
+            <p class="text-[10px] text-slate-400">15-20</p>
+            <p class="text-xs font-bold text-slate-600"><%= rango15_20 %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="card-static">
+      <div class="flex items-center justify-between mb-5 flex-wrap gap-3">
+        <div class="flex items-center gap-2">
+          <div class="icon-box bg-primary-100 text-primary-600">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </div>
+          <div>
+            <h2 class="section-title">Tabla de resultados</h2>
+            <p class="text-xs text-slate-400"><%= resultados.length %> resultado(s) — ordenados por nota</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <% if (secciones.length > 1) { %>
+          <select id="filtro-seccion" class="input-field text-sm py-1.5 w-auto" onchange="filtrarResultados()">
+            <option value="">Todas las secciones</option>
+            <% secciones.forEach(s => { %>
+            <option value="<%= s %>"><%= s %></option>
+            <% }) %>
+          </select>
+          <% } %>
+          <div class="relative">
+            <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="buscar-resultado" class="input-field pl-9 w-48" placeholder="Buscar..." oninput="filtrarResultados()">
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full" id="tabla-resultados">
+          <thead>
+            <tr class="border-b border-slate-200">
+              <th class="table-header w-10">#</th>
+              <th class="table-header">Estudiante</th>
+              <th class="table-header">Sección</th>
+              <th class="table-header text-center">C</th>
+              <th class="table-header text-center">I</th>
+              <th class="table-header text-center">B</th>
+              <th class="table-header text-center">P. Bruto</th>
+              <th class="table-header text-center">Nota /20</th>
+              <th class="table-header text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% resultados.forEach((r, idx) => {
+              const nota = parseFloat(r.nota_vigesimal);
+              const notaPct = Math.min((nota / 20) * 100, 100);
+              let notaColor = 'bg-red-500';
+              let notaTextColor = 'text-red-600';
+              let notaBgColor = 'bg-red-50';
+              if (nota >= 15) { notaColor = 'bg-emerald-500'; notaTextColor = 'text-emerald-700'; notaBgColor = 'bg-emerald-50'; }
+              else if (nota >= 10.5) { notaColor = 'bg-sky-500'; notaTextColor = 'text-sky-700'; notaBgColor = 'bg-sky-50'; }
+              else if (nota >= 5) { notaColor = 'bg-orange-400'; notaTextColor = 'text-orange-600'; notaBgColor = 'bg-orange-50'; }
+            %>
+            <tr class="hover:bg-slate-50/80 transition-colors fila-resultado" data-seccion="<%= r.estudiante.seccion ? r.estudiante.seccion.nombre : '' %>">
+              <!-- Vista normal -->
+              <td class="table-cell r-view" data-rid="<%= r.id %>">
+                <span class="w-6 h-6 rounded-md bg-slate-100 text-slate-500 text-xs font-bold flex items-center justify-center"><%= idx + 1 %></span>
+              </td>
+              <td class="table-cell r-view" data-rid="<%= r.id %>">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-7 h-7 rounded-lg <%= notaBgColor %> <%= notaTextColor %> flex items-center justify-center text-[11px] font-bold shrink-0">
+                    <%= r.estudiante.usuario.nombre.charAt(0).toUpperCase() %>
+                  </div>
+                  <span class="font-semibold text-slate-800 text-sm"><%= r.estudiante.usuario.nombre %></span>
+                </div>
+              </td>
+              <td class="table-cell r-view" data-rid="<%= r.id %>">
+                <span class="badge-blue text-xs"><%= r.estudiante.seccion ? r.estudiante.seccion.nombre : '-' %></span>
+              </td>
+              <td class="table-cell text-center r-view" data-rid="<%= r.id %>">
+                <span class="text-sm font-medium text-emerald-600"><%= r.correctas %></span>
+              </td>
+              <td class="table-cell text-center r-view" data-rid="<%= r.id %>">
+                <span class="text-sm font-medium text-red-500"><%= r.incorrectas %></span>
+              </td>
+              <td class="table-cell text-center r-view" data-rid="<%= r.id %>">
+                <span class="text-sm text-slate-400"><%= r.en_blanco %></span>
+              </td>
+              <td class="table-cell text-center r-view" data-rid="<%= r.id %>">
+                <span class="text-sm font-mono text-slate-600"><%= parseFloat(r.puntaje_bruto).toFixed(2) %></span>
+              </td>
+              <td class="table-cell text-center r-view" data-rid="<%= r.id %>">
+                <div class="flex flex-col items-center gap-1">
+                  <span class="text-sm font-bold <%= notaTextColor %>"><%= nota.toFixed(2) %></span>
+                  <div class="w-14 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full rounded-full <%= notaColor %>" style="width: <%= notaPct %>%"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="table-cell text-right r-view" data-rid="<%= r.id %>">
+                <div class="flex items-center justify-end gap-1">
+                  <button onclick="editarResultado(<%= r.id %>, <%= r.correctas %>, <%= r.incorrectas %>, <%= r.en_blanco %>)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors" title="Editar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </button>
+                  <form action="/admin/resultados/<%= r.id %>/delete" method="POST" class="inline" onsubmit="return confirm('¿Eliminar resultado de «<%= r.estudiante.usuario.nombre %>»?')">
+                    <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-accent-600 hover:bg-accent-50 transition-colors" title="Eliminar">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                    </button>
+                  </form>
+                </div>
+              </td>
+              <!-- Vista edición -->
+              <td class="table-cell r-edit hidden" data-rid="<%= r.id %>" colspan="9">
+                <form action="/admin/resultados/<%= r.id %>/update" method="POST" class="flex items-center gap-2 flex-wrap bg-primary-50/50 -m-2 p-3 rounded-xl">
+                  <div class="flex items-center gap-2 mr-2">
+                    <div class="w-7 h-7 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center text-[11px] font-bold shrink-0">
+                      <%= r.estudiante.usuario.nombre.charAt(0).toUpperCase() %>
+                    </div>
+                    <span class="text-sm font-semibold text-slate-700"><%= r.estudiante.usuario.nombre %></span>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <label class="text-xs font-medium text-emerald-600">C:</label>
+                    <input type="number" name="correctas" value="<%= r.correctas %>" class="input-field w-16 text-sm py-1 text-center" min="0" max="<%= examenActual.total_preguntas %>" required>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <label class="text-xs font-medium text-red-500">I:</label>
+                    <input type="number" name="incorrectas" value="<%= r.incorrectas %>" class="input-field w-16 text-sm py-1 text-center" min="0" max="<%= examenActual.total_preguntas %>" required>
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <label class="text-xs font-medium text-slate-400">B:</label>
+                    <input type="number" name="en_blanco" value="<%= r.en_blanco %>" class="input-field w-16 text-sm py-1 text-center" min="0" max="<%= examenActual.total_preguntas %>" required>
+                  </div>
+                  <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-primary-600 hover:bg-primary-700 transition-colors" title="Guardar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                  </button>
+                  <button type="button" onclick="cancelarEdicion(<%= r.id %>)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors" title="Cancelar">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                  </button>
+                </form>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+function editarResultado(id, c, i, b) {
+  document.querySelectorAll('.r-view[data-rid="' + id + '"]').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.r-edit[data-rid="' + id + '"]').forEach(el => el.classList.remove('hidden'));
+}
+function cancelarEdicion(id) {
+  document.querySelectorAll('.r-view[data-rid="' + id + '"]').forEach(el => el.classList.remove('hidden'));
+  document.querySelectorAll('.r-edit[data-rid="' + id + '"]').forEach(el => el.classList.add('hidden'));
+}
+function filtrarResultados() {
+  const q = document.getElementById('buscar-resultado').value.toLowerCase();
+  const seccionSel = document.getElementById('filtro-seccion');
+  const seccion = seccionSel ? seccionSel.value : '';
+  document.querySelectorAll('.fila-resultado').forEach(row => {
+    const texto = row.textContent.toLowerCase().includes(q);
+    const secOk = !seccion || row.dataset.seccion === seccion;
+    row.style.display = (texto && secOk) ? '' : 'none';
+  });
+}
+</script>

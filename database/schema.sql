@@ -1,0 +1,119 @@
+-- =============================================
+-- JCM 5to - Schema de Base de Datos
+-- =============================================
+
+CREATE DATABASE IF NOT EXISTS jcm_5to
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_unicode_ci;
+
+USE jcm_5to;
+
+-- Usuarios (todos los roles)
+CREATE TABLE IF NOT EXISTS usuarios (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  rol ENUM('admin', 'estudiante', 'padre') NOT NULL,
+  activo TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Secciones (nombres personalizados por admin)
+CREATE TABLE IF NOT EXISTS secciones (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Áreas (A, B, C... configurables)
+CREATE TABLE IF NOT EXISTS areas (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(100) NOT NULL UNIQUE,
+  descripcion TEXT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Carreras por área
+CREATE TABLE IF NOT EXISTS carreras (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nombre VARCHAR(150) NOT NULL,
+  area_id INT NOT NULL,
+  puntaje_minimo_admision DECIMAL(6,4) DEFAULT 0.0000,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Estudiantes
+CREATE TABLE IF NOT EXISTS estudiantes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL UNIQUE,
+  dni VARCHAR(20) NOT NULL UNIQUE,
+  seccion_id INT NOT NULL,
+  area_id INT NOT NULL,
+  carrera_id INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+  FOREIGN KEY (seccion_id) REFERENCES secciones(id) ON DELETE RESTRICT,
+  FOREIGN KEY (area_id) REFERENCES areas(id) ON DELETE RESTRICT,
+  FOREIGN KEY (carrera_id) REFERENCES carreras(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- Padres
+CREATE TABLE IF NOT EXISTS padres (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Tabla pivote: Padre - Estudiante (M:N)
+CREATE TABLE IF NOT EXISTS padre_estudiante (
+  padre_id INT NOT NULL,
+  estudiante_id INT NOT NULL,
+  PRIMARY KEY (padre_id, estudiante_id),
+  FOREIGN KEY (padre_id) REFERENCES padres(id) ON DELETE CASCADE,
+  FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Exámenes
+CREATE TABLE IF NOT EXISTS examenes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  tipo ENUM('aptitud', 'conocimientos') NOT NULL,
+  fecha DATE NOT NULL,
+  total_preguntas INT NOT NULL,
+  descripcion VARCHAR(255),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Resultados por estudiante por examen
+CREATE TABLE IF NOT EXISTS resultados (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  estudiante_id INT NOT NULL,
+  examen_id INT NOT NULL,
+  correctas INT NOT NULL DEFAULT 0,
+  incorrectas INT NOT NULL DEFAULT 0,
+  en_blanco INT NOT NULL DEFAULT 0,
+  puntaje_bruto DECIMAL(10,4) NOT NULL DEFAULT 0.0000,
+  nota_vigesimal DECIMAL(6,4) NOT NULL DEFAULT 0.0000,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_estudiante_examen (estudiante_id, examen_id),
+  FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id) ON DELETE CASCADE,
+  FOREIGN KEY (examen_id) REFERENCES examenes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Configuración del sistema (clave-valor)
+CREATE TABLE IF NOT EXISTS configuracion (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  clave VARCHAR(100) NOT NULL UNIQUE,
+  valor TEXT,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;

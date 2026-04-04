@@ -1,0 +1,206 @@
+<!-- Áreas y Carreras CRUD -->
+<div class="hidden lg:block mb-8">
+  <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Áreas y Carreras</h1>
+  <p class="text-slate-500 mt-1">Configura las áreas de estudio y sus carreras referenciales</p>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Panel de creación -->
+  <div class="lg:col-span-1 space-y-6">
+    <!-- Crear Área -->
+    <div class="card-static">
+      <div class="flex items-center gap-2 mb-5">
+        <div class="icon-box bg-gold-100 text-gold-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        </div>
+        <h2 class="section-title">Nueva Área</h2>
+      </div>
+      <form action="/admin/areas" method="POST" class="space-y-4">
+        <div>
+          <label for="area-nombre" class="input-label">Nombre del área</label>
+          <input type="text" id="area-nombre" name="nombre" class="input-field" placeholder="Ej: Área A" required>
+        </div>
+        <div>
+          <label for="area-desc" class="input-label">Descripción</label>
+          <textarea id="area-desc" name="descripcion" class="input-field" rows="2" placeholder="Ej: Ingenierías y Ciencias"></textarea>
+        </div>
+        <button type="submit" class="btn-gold w-full">
+          <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          Crear Área
+        </button>
+      </form>
+    </div>
+
+    <!-- Crear Carrera -->
+    <% if (areas.length > 0) { %>
+    <div class="card-static">
+      <div class="flex items-center gap-2 mb-5">
+        <div class="icon-box bg-primary-100 text-primary-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        </div>
+        <h2 class="section-title">Nueva Carrera</h2>
+      </div>
+      <form action="/admin/carreras" method="POST" class="space-y-4">
+        <div>
+          <label for="carrera-nombre" class="input-label">Nombre de la carrera</label>
+          <input type="text" id="carrera-nombre" name="nombre" class="input-field" placeholder="Ej: Ingeniería Civil" required>
+        </div>
+        <div>
+          <label for="carrera-area" class="input-label">Área</label>
+          <select id="carrera-area" name="area_id" class="input-field" required>
+            <option value="">Seleccionar área...</option>
+            <% areas.forEach(area => { %>
+            <option value="<%= area.id %>"><%= area.nombre %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label for="carrera-puntaje" class="input-label">Puntaje mínimo de admisión</label>
+          <input type="number" id="carrera-puntaje" name="puntaje_minimo_admision" class="input-field" step="0.0001" min="0" max="20" placeholder="Ej: 12.5000" value="0">
+        </div>
+        <button type="submit" class="btn-primary w-full">
+          <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          Crear Carrera
+        </button>
+      </form>
+    </div>
+    <% } %>
+  </div>
+
+  <!-- Lista de áreas con carreras -->
+  <div class="lg:col-span-2 space-y-4">
+    <% if (areas.length === 0) { %>
+    <div class="card-static text-center py-12">
+      <div class="icon-box bg-gold-100 text-gold-400 mx-auto mb-3 w-14 h-14 rounded-2xl">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+      </div>
+      <p class="text-sm font-medium text-slate-500">No hay áreas registradas</p>
+      <p class="text-xs text-slate-400 mt-1">Crea la primera usando el formulario</p>
+    </div>
+    <% } else { %>
+      <% areas.forEach(area => { %>
+      <div class="card-static">
+        <!-- Cabecera del área -->
+        <div class="flex items-start justify-between mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gold-100 text-gold-700 flex items-center justify-center text-sm font-bold shrink-0">
+              <%= area.nombre.substring(0, 2).toUpperCase() %>
+            </div>
+            <div>
+              <h3 class="text-base font-bold text-slate-800"><%= area.nombre %></h3>
+              <% if (area.descripcion) { %>
+              <p class="text-xs text-slate-400"><%= area.descripcion %></p>
+              <% } %>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="badge-yellow"><%= area.estudiantes ? area.estudiantes.length : 0 %> est.</span>
+            <button onclick="toggleEditArea(<%= area.id %>)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-colors" title="Editar área">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+            </button>
+            <form action="/admin/areas/<%= area.id %>/delete" method="POST" class="inline" onsubmit="return confirm('¿Eliminar «<%= area.nombre %>» y todas sus carreras?')">
+              <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-accent-600 hover:bg-accent-50 transition-colors" title="Eliminar área">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Form editar área (oculto) -->
+        <div id="edit-area-<%= area.id %>" class="hidden mb-4 p-4 bg-gold-50/50 rounded-xl border border-gold-200">
+          <form action="/admin/areas/<%= area.id %>/update" method="POST" class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[200px]">
+              <label class="input-label">Nombre</label>
+              <input type="text" name="nombre" value="<%= area.nombre %>" class="input-field" required>
+            </div>
+            <div class="flex-1 min-w-[200px]">
+              <label class="input-label">Descripción</label>
+              <input type="text" name="descripcion" value="<%= area.descripcion || '' %>" class="input-field">
+            </div>
+            <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-gold-500 hover:bg-gold-600 transition-colors shrink-0" title="Guardar">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </button>
+            <button type="button" onclick="toggleEditArea(<%= area.id %>)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors shrink-0" title="Cancelar">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </form>
+        </div>
+
+        <!-- Carreras del área -->
+        <% if (area.carreras && area.carreras.length > 0) { %>
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-slate-200">
+                <th class="table-header">Carrera</th>
+                <th class="table-header text-center">Puntaje Mín.</th>
+                <th class="table-header text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <% area.carreras.forEach(carrera => { %>
+              <tr class="hover:bg-slate-50/80 transition-colors">
+                <td class="table-cell carrera-view" data-cid="<%= carrera.id %>">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-7 h-7 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center shrink-0">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <span class="font-semibold text-slate-700 text-sm"><%= carrera.nombre %></span>
+                  </div>
+                </td>
+                <td class="table-cell text-center carrera-view" data-cid="<%= carrera.id %>">
+                  <span class="text-sm font-mono font-semibold text-slate-600"><%= parseFloat(carrera.puntaje_minimo_admision).toFixed(2) %></span>
+                </td>
+                <td class="table-cell text-right carrera-view" data-cid="<%= carrera.id %>">
+                  <div class="flex items-center justify-end gap-1">
+                    <button onclick="editCarrera(<%= carrera.id %>, '<%= carrera.nombre %>', '<%= carrera.puntaje_minimo_admision %>')" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors" title="Editar">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </button>
+                    <form action="/admin/carreras/<%= carrera.id %>/delete" method="POST" class="inline" onsubmit="return confirm('¿Eliminar la carrera «<%= carrera.nombre %>»?')">
+                      <button type="submit" class="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-accent-600 hover:bg-accent-50 transition-colors" title="Eliminar">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+                <td class="table-cell carrera-edit hidden" data-cid="<%= carrera.id %>" colspan="3">
+                  <form action="/admin/carreras/<%= carrera.id %>/update" method="POST" class="flex items-center gap-2">
+                    <input type="text" name="nombre" value="<%= carrera.nombre %>" class="input-field flex-1" required>
+                    <input type="number" name="puntaje_minimo_admision" value="<%= carrera.puntaje_minimo_admision %>" class="input-field w-28" step="0.0001" min="0">
+                    <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-primary-600 hover:bg-primary-700 transition-colors shrink-0" title="Guardar">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    </button>
+                    <button type="button" onclick="cancelCarrera(<%= carrera.id %>)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 bg-slate-100 hover:bg-slate-200 transition-colors shrink-0" title="Cancelar">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+        <% } else { %>
+        <div class="text-center py-6 bg-slate-50/50 rounded-lg">
+          <p class="text-sm text-slate-400">Sin carreras registradas en esta área</p>
+        </div>
+        <% } %>
+      </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<script>
+function toggleEditArea(id) {
+  document.getElementById('edit-area-' + id).classList.toggle('hidden');
+}
+function editCarrera(id, nombre, puntaje) {
+  document.querySelectorAll('.carrera-view[data-cid="' + id + '"]').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('.carrera-edit[data-cid="' + id + '"]').forEach(el => el.classList.remove('hidden'));
+}
+function cancelCarrera(id) {
+  document.querySelectorAll('.carrera-view[data-cid="' + id + '"]').forEach(el => el.classList.remove('hidden'));
+  document.querySelectorAll('.carrera-edit[data-cid="' + id + '"]').forEach(el => el.classList.add('hidden'));
+}
+</script>

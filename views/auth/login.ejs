@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> — PIU Mariátegui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="min-h-screen bg-primary-950" style="font-family: 'Inter', sans-serif;">
+  <div class="min-h-screen flex">
+    
+    <!-- Panel izquierdo: Imagen de fondo -->
+    <div class="hidden lg:flex lg:w-1/2 xl:w-3/5 relative overflow-hidden">
+      <img src="/img/fondo_login.jpg" alt="" class="absolute inset-0 w-full h-full object-cover" aria-hidden="true">
+      <div class="absolute inset-0 bg-gradient-to-br from-primary-950/80 via-primary-900/60 to-primary-950/80"></div>
+      <div class="relative z-10 flex flex-col justify-between p-12 w-full">
+        <div>
+          <div class="flex items-center gap-3">
+            <img src="/img/logo-blanco.png" alt="PIU Mariátegui" class="w-12 h-12 object-contain">
+            <span class="text-white font-bold text-lg">PIU Mariátegui</span>
+          </div>
+        </div>
+        <div class="max-w-lg">
+          <h2 class="text-4xl xl:text-5xl font-extrabold text-white leading-tight tracking-tight mb-4">
+            Plataforma Integral<br>de Desempeño<br>Estudiantil
+          </h2>
+          <p class="text-primary-200 text-lg leading-relaxed">
+            Seguimiento académico del 5to año de secundaria — Resultados, rankings y evolución en tiempo real.
+          </p>
+          <div class="flex items-center gap-6 mt-8">
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
+                <svg class="w-5 h-5 text-gold-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              </div>
+              <div>
+                <p class="text-white font-semibold text-sm">Rankings</p>
+                <p class="text-primary-300 text-xs">En tiempo real</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+              </div>
+              <div>
+                <p class="text-white font-semibold text-sm">Evolución</p>
+                <p class="text-primary-300 text-xs">Por examen</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
+                <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+              </div>
+              <div>
+                <p class="text-white font-semibold text-sm">Reportes</p>
+                <p class="text-primary-300 text-xs">Detallados</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="text-primary-400 text-xs">Desarrollado por: Jerson Espinoza - Área de Innovación</p>
+      </div>
+    </div>
+
+    <!-- Panel derecho: Formulario -->
+    <div class="w-full lg:w-1/2 xl:w-2/5 flex items-center justify-center bg-white relative">
+      <!-- Fondo sutil en mobile -->
+      <div class="absolute inset-0 lg:hidden">
+        <img src="/img/fondo_login.jpg" alt="" class="w-full h-full object-cover opacity-10" aria-hidden="true">
+      </div>
+
+      <div class="relative z-10 w-full max-w-md px-6 sm:px-10 py-12">
+        <!-- Logo y título -->
+        <div class="text-center mb-10">
+          <img src="/img/logo.png" alt="PIU Mariátegui" class="w-20 h-20 object-contain mx-auto mb-5 drop-shadow-lg">
+          <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">PIU Mariátegui</h1>
+          <p class="text-slate-400 text-sm mt-1">Ingresa con tus credenciales</p>
+        </div>
+
+        <!-- Mensajes flash -->
+        <% if (locals.error) { %>
+        <div class="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm" role="alert">
+          <div class="flex items-center gap-2.5">
+            <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
+            <span><%= error %></span>
+          </div>
+        </div>
+        <% } %>
+
+        <% if (locals.success) { %>
+        <div class="mb-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 text-sm" role="alert">
+          <div class="flex items-center gap-2.5">
+            <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            <span><%= success %></span>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- Formulario -->
+        <form action="/login" method="POST" class="space-y-5">
+          <div>
+            <label for="email" class="block text-sm font-semibold text-slate-700 mb-1.5">Correo electrónico</label>
+            <div class="relative">
+              <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                class="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all outline-none"
+                placeholder="usuario@jcm5to.edu.pe"
+                required
+                autocomplete="email"
+              >
+            </div>
+          </div>
+          <div>
+            <label for="password" class="block text-sm font-semibold text-slate-700 mb-1.5">Contraseña</label>
+            <div class="relative">
+              <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              </div>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="w-full pl-11 pr-12 py-3 rounded-xl border-2 border-slate-200 text-sm text-slate-800 placeholder-slate-400 focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all outline-none"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+              >
+              <button
+                type="button"
+                onclick="togglePassword()"
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary-600 transition-colors p-0.5"
+                aria-label="Mostrar contraseña"
+              >
+                <svg id="eye-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+                <svg id="eye-closed" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L6.11 6.11m3.768 3.768l4.242 4.242m0 0l3.768 3.768M6.11 6.11L3 3m3.11 3.11l4.242 4.242"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white font-semibold rounded-xl transition-all shadow-lg shadow-primary-600/25 flex items-center justify-center gap-2 text-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+            Ingresar
+          </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="mt-8 pt-6 border-t border-slate-100 text-center">
+          <p class="text-xs text-slate-400">I.E. José Carlos Mariátegui — Ica, Perú</p>
+          <p class="text-[10px] text-slate-300 mt-1">© 2026 PIU Mariátegui</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword() {
+      const input = document.getElementById('password');
+      const eyeOpen = document.getElementById('eye-open');
+      const eyeClosed = document.getElementById('eye-closed');
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      eyeOpen.classList.toggle('hidden');
+      eyeClosed.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>

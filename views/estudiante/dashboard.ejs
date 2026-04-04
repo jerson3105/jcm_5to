@@ -1,0 +1,155 @@
+<!-- Estudiante Dashboard -->
+<div class="hidden lg:block mb-8">
+  <h1 class="text-2xl font-bold text-slate-800">Mi Dashboard</h1>
+  <p class="text-slate-500 mt-1">Bienvenido, <%= user.nombre %> — <span class="text-primary-600 font-medium"><%= estudiante.seccion ? estudiante.seccion.nombre : '' %></span></p>
+</div>
+
+<!-- Stat Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="stat-card">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium text-slate-500">Último Examen</span>
+      <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-800 mt-3"><%= ultimoResultado ? parseFloat(ultimoResultado.nota_vigesimal).toFixed(2) : '--' %></p>
+    <p class="text-xs text-slate-400 mt-1"><%= ultimoResultado ? ultimoResultado.examen.descripcion || 'Nota vigesimal' : 'Sin exámenes aún' %></p>
+  </div>
+
+  <div class="stat-card">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium text-slate-500">Promedio General</span>
+      <div class="w-10 h-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-800 mt-3"><%= totalExamenes > 0 ? promedioGeneral : '--' %></p>
+    <p class="text-xs text-slate-400 mt-1">Escala vigesimal</p>
+  </div>
+
+  <div class="stat-card">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium text-slate-500">Mi Ranking</span>
+      <div class="w-10 h-10 rounded-lg bg-yellow-50 text-yellow-600 flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-800 mt-3"><%= miRanking %></p>
+    <p class="text-xs text-slate-400 mt-1">Puesto general</p>
+  </div>
+
+  <div class="stat-card">
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium text-slate-500">Exámenes</span>
+      <div class="w-10 h-10 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+      </div>
+    </div>
+    <p class="text-3xl font-bold text-slate-800 mt-3"><%= totalExamenes %></p>
+    <p class="text-xs text-slate-400 mt-1">Exámenes rendidos</p>
+  </div>
+</div>
+
+<% if (totalExamenes > 0) { %>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+  <!-- Resumen estadístico -->
+  <div class="card">
+    <h3 class="text-sm font-semibold text-slate-700 mb-4">Resumen de Rendimiento</h3>
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-slate-500">Nota más alta</span>
+        <span class="text-sm font-bold text-green-600"><%= notaMaxima %></span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-slate-500">Nota más baja</span>
+        <span class="text-sm font-bold text-red-500"><%= notaMinima %></span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-slate-500">Promedio</span>
+        <span class="text-sm font-bold text-primary-600"><%= promedioGeneral %></span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-slate-500">Área</span>
+        <span class="badge-blue"><%= estudiante.area ? estudiante.area.nombre : 'N/A' %></span>
+      </div>
+      <% if (estudiante.carrera) { %>
+      <div class="flex items-center justify-between">
+        <span class="text-sm text-slate-500">Carrera ref.</span>
+        <span class="badge-green"><%= estudiante.carrera.nombre %></span>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Últimos resultados -->
+  <div class="card lg:col-span-2">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold text-slate-700">Últimos Resultados</h3>
+      <a href="/estudiante/examenes" class="text-xs text-primary-600 hover:text-primary-700 font-medium">Ver todos →</a>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead>
+          <tr class="border-b border-slate-200">
+            <th class="table-header">Examen</th>
+            <th class="table-header">Fecha</th>
+            <th class="table-header text-center">C / I / B</th>
+            <th class="table-header text-right">Nota</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <% ultimos5.forEach(function(r) { %>
+          <tr class="hover:bg-slate-50">
+            <td class="table-cell">
+              <div class="font-medium text-slate-800"><%= r.examen.descripcion || r.examen.tipo %></div>
+              <div class="text-xs text-slate-400"><%= r.examen.tipo === 'aptitud' ? 'Aptitud' : 'Conocimientos' %></div>
+            </td>
+            <td class="table-cell text-slate-500"><%= new Date(r.examen.fecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) %></td>
+            <td class="table-cell text-center">
+              <span class="text-green-600 font-medium"><%= r.correctas %></span> /
+              <span class="text-red-500 font-medium"><%= r.incorrectas %></span> /
+              <span class="text-slate-400"><%= r.en_blanco %></span>
+            </td>
+            <td class="table-cell text-right">
+              <span class="text-lg font-bold <%= parseFloat(r.nota_vigesimal) >= 11 ? 'text-green-600' : 'text-red-500' %>">
+                <%= parseFloat(r.nota_vigesimal).toFixed(2) %>
+              </span>
+            </td>
+          </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Indicador de progreso visual -->
+<div class="card">
+  <h3 class="text-sm font-semibold text-slate-700 mb-4">Progreso por Examen</h3>
+  <div class="space-y-3">
+    <% ultimos5.forEach(function(r) { 
+      const nota = parseFloat(r.nota_vigesimal);
+      const porcentaje = (nota / 20 * 100).toFixed(0);
+      const color = nota >= 14 ? 'bg-green-500' : nota >= 11 ? 'bg-yellow-500' : 'bg-red-500';
+    %>
+    <div>
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-xs font-medium text-slate-600"><%= r.examen.descripcion || r.examen.tipo %> — <%= r.examen.fecha %></span>
+        <span class="text-xs font-bold text-slate-700"><%= nota.toFixed(2) %></span>
+      </div>
+      <div class="w-full bg-slate-100 rounded-full h-2">
+        <div class="<%= color %> rounded-full h-2 transition-all duration-500" style="width: <%= porcentaje %>%"></div>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+</div>
+<% } else { %>
+<!-- Sin resultados -->
+<div class="card text-center py-12">
+  <svg class="w-16 h-16 mx-auto text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+  <h3 class="text-lg font-medium text-slate-600">Aún no tienes resultados</h3>
+  <p class="text-sm text-slate-400 mt-1">Cuando el administrador suba tus resultados, los verás aquí.</p>
+</div>
+<% } %>

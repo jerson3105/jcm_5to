@@ -1,0 +1,187 @@
+<!-- Rankings del Estudiante -->
+<div class="hidden lg:block mb-8">
+  <h1 class="text-2xl font-bold text-slate-800">Rankings</h1>
+  <p class="text-slate-500 mt-1">Tu posición entre todos los estudiantes</p>
+</div>
+
+<!-- Mi posición destacada -->
+<% if (miPosicion) { %>
+<div class="card-static mb-6 border-l-4 border-primary-500 bg-primary-50/30">
+  <div class="flex items-center justify-between flex-wrap gap-4">
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-xl bg-primary-100 text-primary-700 flex items-center justify-center text-xl font-extrabold">
+        <%= miPosicion.posicion %>°
+      </div>
+      <div>
+        <h2 class="text-lg font-bold text-slate-800">Tu posición actual</h2>
+        <p class="text-sm text-slate-500">
+          <% if (tipoRanking === 'examen') { %>
+            Nota: <span class="font-bold text-primary-600"><%= miPosicion.nota_vigesimal.toFixed(2) %></span>
+          <% } else { %>
+            Promedio: <span class="font-bold text-primary-600"><%= miPosicion.nota_vigesimal.toFixed(2) %></span>
+          <% } %>
+          de <%= stats.totalEstudiantes %> estudiantes
+        </p>
+      </div>
+    </div>
+    <div class="flex items-center gap-6">
+      <div class="text-center">
+        <p class="text-xs text-slate-400">Prom. General</p>
+        <p class="text-lg font-bold text-slate-700"><%= stats.promedioGlobal %></p>
+      </div>
+      <div class="text-center">
+        <p class="text-xs text-slate-400">Total</p>
+        <p class="text-lg font-bold text-slate-700"><%= stats.totalEstudiantes %></p>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<!-- Filtro por examen -->
+<div class="card-static mb-6">
+  <form method="GET" action="/estudiante/rankings" class="flex flex-col sm:flex-row gap-4 items-end">
+    <div class="flex-1">
+      <label class="input-label">Filtrar por examen</label>
+      <select name="examen_id" class="input-field text-sm" onchange="this.form.submit()">
+        <option value="">Promedio General</option>
+        <% examenes.forEach(function(e) { %>
+        <option value="<%= e.id %>" <%= filtros.examen_id == e.id ? 'selected' : '' %>>
+          <%= e.tipo === 'aptitud' ? '📘' : '📗' %> <%= e.descripcion || (e.tipo === 'aptitud' ? 'Aptitud' : 'Conocimientos') %> — <%= new Date(e.fecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+        </option>
+        <% }); %>
+      </select>
+    </div>
+    <a href="/estudiante/rankings" class="btn-secondary text-sm">
+      <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      Limpiar
+    </a>
+  </form>
+</div>
+
+<% if (rankingData.length === 0) { %>
+<div class="card-static text-center py-16">
+  <div class="icon-box bg-primary-100 text-primary-300 mx-auto mb-4 w-16 h-16 rounded-2xl">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+  </div>
+  <p class="text-sm font-medium text-slate-500">Sin datos de ranking</p>
+  <p class="text-xs text-slate-400 mt-1">Aún no hay resultados registrados</p>
+</div>
+<% } else { %>
+
+<!-- Podio Top 3 -->
+<% if (rankingData.length >= 3) { %>
+<div class="flex items-end justify-center gap-3 mb-6">
+  <%
+    const podioOrder = [1, 0, 2];
+    const podioHeights = ['h-36', 'h-44', 'h-32'];
+    const podioGradients = ['from-slate-200 to-slate-300', 'from-gold-300 to-gold-400', 'from-orange-200 to-orange-300'];
+    const podioTextColors = ['text-slate-700', 'text-gold-800', 'text-orange-700'];
+    const podioMedals = ['🥈', '🥇', '🥉'];
+    const podioBorder = ['border-slate-300', 'border-gold-400', 'border-orange-300'];
+  %>
+  <% podioOrder.forEach(function(idx, i) { const r = rankingData[idx]; %>
+  <div class="flex-1 max-w-[200px]">
+    <div class="text-center mb-3">
+      <div class="w-12 h-12 mx-auto rounded-full bg-white border-2 <%= podioBorder[i] %> flex items-center justify-center shadow-md mb-2 <%= r.estudiante_id === estudiante.id ? 'ring-2 ring-primary-400 ring-offset-2' : '' %>">
+        <span class="text-2xl"><%= podioMedals[i] %></span>
+      </div>
+      <h4 class="font-bold text-sm truncate px-2 <%= r.estudiante_id === estudiante.id ? 'text-primary-700' : 'text-slate-800' %>"><%= r.nombre %></h4>
+      <p class="text-[11px] text-slate-400 truncate"><%= r.seccion %></p>
+    </div>
+    <div class="<%= podioHeights[i] %> bg-gradient-to-t <%= podioGradients[i] %> rounded-t-2xl flex flex-col items-center justify-center relative <%= r.estudiante_id === estudiante.id ? 'ring-2 ring-primary-400' : '' %>">
+      <span class="text-3xl font-extrabold <%= podioTextColors[i] %>"><%= r.nota_vigesimal.toFixed(1) %></span>
+      <span class="text-xs <%= podioTextColors[i] %> opacity-70"><%= tipoRanking === 'examen' ? 'nota' : 'prom.' %></span>
+      <span class="absolute bottom-3 text-4xl font-black text-white/30"><%= r.posicion %></span>
+    </div>
+  </div>
+  <% }); %>
+</div>
+<% } %>
+
+<!-- Tabla de ranking -->
+<div class="card-static">
+  <div class="flex items-center gap-2 mb-5">
+    <div class="icon-box bg-gold-100 text-gold-600">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    </div>
+    <div>
+      <h2 class="section-title">Ranking <%= tipoRanking === 'examen' ? 'por Examen' : 'General (Promedio)' %></h2>
+      <p class="text-xs text-slate-400"><%= rankingData.length %> estudiantes</p>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="table-header w-14">#</th>
+          <th class="table-header">Estudiante</th>
+          <th class="table-header">Sección</th>
+          <% if (tipoRanking === 'examen') { %>
+          <th class="table-header text-center">C / I / B</th>
+          <% } else { %>
+          <th class="table-header text-center">Exámenes</th>
+          <% } %>
+          <th class="table-header text-right"><%= tipoRanking === 'examen' ? 'Nota' : 'Promedio' %></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% rankingData.forEach(function(r) {
+          const nota = r.nota_vigesimal;
+          const esMio = r.estudiante_id === estudiante.id;
+          let notaTextColor = 'text-red-500';
+          if (nota >= 15) notaTextColor = 'text-emerald-600';
+          else if (nota >= 10.5) notaTextColor = 'text-sky-600';
+          else if (nota >= 5) notaTextColor = 'text-orange-500';
+        %>
+        <% if (esMio) { %>
+        <tr class="bg-primary-50/60 border-l-4 border-primary-500">
+        <% } else { %>
+        <tr class="hover:bg-slate-50/80 transition-colors">
+        <% } %>
+          <td class="table-cell">
+            <% if (r.posicion === 1) { %>
+            <span class="w-8 h-8 rounded-full bg-gold-100 text-gold-700 flex items-center justify-center text-xs font-bold">1°</span>
+            <% } else if (r.posicion === 2) { %>
+            <span class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">2°</span>
+            <% } else if (r.posicion === 3) { %>
+            <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">3°</span>
+            <% } else { %>
+            <span class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-xs font-medium"><%= r.posicion %>°</span>
+            <% } %>
+          </td>
+          <td class="table-cell">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 <%= esMio ? 'bg-primary-100 text-primary-700' : 'bg-primary-50 text-primary-600' %>">
+                <%= r.nombre.charAt(0).toUpperCase() %>
+              </div>
+              <div>
+                <span class="font-semibold text-sm <%= esMio ? 'text-primary-700' : 'text-slate-800' %>"><%= r.nombre %> <% if (esMio) { %><span class="text-xs font-normal text-primary-500">(Tú)</span><% } %></span>
+                <% if (r.carrera) { %><p class="text-[11px] text-slate-400"><%= r.carrera %></p><% } %>
+              </div>
+            </div>
+          </td>
+          <td class="table-cell"><span class="badge-blue text-xs"><%= r.seccion %></span></td>
+
+          <% if (tipoRanking === 'examen') { %>
+          <td class="table-cell text-center">
+            <span class="text-emerald-600 font-medium text-sm"><%= r.correctas %></span>
+            <span class="text-slate-300 mx-0.5">/</span>
+            <span class="text-red-500 font-medium text-sm"><%= r.incorrectas %></span>
+            <span class="text-slate-300 mx-0.5">/</span>
+            <span class="text-slate-400 text-sm"><%= r.en_blanco %></span>
+          </td>
+          <% } else { %>
+          <td class="table-cell text-center"><span class="badge-blue text-xs"><%= r.total_examenes %></span></td>
+          <% } %>
+          <td class="table-cell text-right">
+            <span class="text-base font-bold <%= notaTextColor %>"><%= nota.toFixed(2) %></span>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
+<% } %>

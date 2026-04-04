@@ -1,0 +1,320 @@
+<!-- Promedios -->
+<div class="hidden lg:block mb-8">
+  <h1 class="text-2xl font-bold text-slate-800">Promedios</h1>
+  <p class="text-slate-500 mt-1">Análisis detallado de tu rendimiento por tipo de examen</p>
+</div>
+
+<% if (totalExamenes === 0) { %>
+<div class="card-static text-center py-16">
+  <div class="icon-box bg-primary-100 text-primary-300 mx-auto mb-4 w-16 h-16 rounded-2xl">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+  </div>
+  <p class="text-sm font-medium text-slate-500">Aún no tienes resultados</p>
+  <p class="text-xs text-slate-400 mt-1">Cuando tengas exámenes, verás tus promedios aquí</p>
+</div>
+<% } else { %>
+
+<!-- Tarjetas de promedios principales -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+  <!-- Promedio General -->
+  <div class="card-static border-t-4 border-primary-500">
+    <div class="text-center">
+      <p class="text-sm font-medium text-slate-500 mb-2">Promedio General</p>
+      <p class="text-4xl font-extrabold <%= parseFloat(promedioGeneral) >= 14 ? 'text-emerald-600' : parseFloat(promedioGeneral) >= 11 ? 'text-sky-600' : 'text-red-500' %>"><%= promedioGeneral %></p>
+      <p class="text-xs text-slate-400 mt-2"><%= totalExamenes %> exámenes</p>
+      <div class="w-full bg-slate-100 rounded-full h-2 mt-3">
+        <% const pctGen = (parseFloat(promedioGeneral) / 20 * 100).toFixed(0); %>
+        <% if (parseFloat(promedioGeneral) >= 14) { %>
+        <div class="h-full rounded-full bg-emerald-500" style="width: <%= pctGen %>%"></div>
+        <% } else if (parseFloat(promedioGeneral) >= 11) { %>
+        <div class="h-full rounded-full bg-sky-500" style="width: <%= pctGen %>%"></div>
+        <% } else { %>
+        <div class="h-full rounded-full bg-red-500" style="width: <%= pctGen %>%"></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Promedio Aptitud -->
+  <div class="card-static border-t-4 border-blue-500">
+    <div class="text-center">
+      <p class="text-sm font-medium text-slate-500 mb-2">📘 Aptitud</p>
+      <p class="text-4xl font-extrabold <%= parseFloat(promedioAptitud) >= 14 ? 'text-emerald-600' : parseFloat(promedioAptitud) >= 11 ? 'text-sky-600' : 'text-red-500' %>"><%= promedioAptitud %></p>
+      <p class="text-xs text-slate-400 mt-2"><%= totalAptitud %> exámenes</p>
+      <div class="w-full bg-slate-100 rounded-full h-2 mt-3">
+        <% const pctApt = (parseFloat(promedioAptitud) / 20 * 100).toFixed(0); %>
+        <% if (parseFloat(promedioAptitud) >= 14) { %>
+        <div class="h-full rounded-full bg-emerald-500" style="width: <%= pctApt %>%"></div>
+        <% } else if (parseFloat(promedioAptitud) >= 11) { %>
+        <div class="h-full rounded-full bg-sky-500" style="width: <%= pctApt %>%"></div>
+        <% } else { %>
+        <div class="h-full rounded-full bg-red-500" style="width: <%= pctApt %>%"></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Promedio Conocimientos -->
+  <div class="card-static border-t-4 border-green-500">
+    <div class="text-center">
+      <p class="text-sm font-medium text-slate-500 mb-2">📗 Conocimientos</p>
+      <p class="text-4xl font-extrabold <%= parseFloat(promedioConocimientos) >= 14 ? 'text-emerald-600' : parseFloat(promedioConocimientos) >= 11 ? 'text-sky-600' : 'text-red-500' %>"><%= promedioConocimientos %></p>
+      <p class="text-xs text-slate-400 mt-2"><%= totalConocimientos %> exámenes</p>
+      <div class="w-full bg-slate-100 rounded-full h-2 mt-3">
+        <% const pctCon = (parseFloat(promedioConocimientos) / 20 * 100).toFixed(0); %>
+        <% if (parseFloat(promedioConocimientos) >= 14) { %>
+        <div class="h-full rounded-full bg-emerald-500" style="width: <%= pctCon %>%"></div>
+        <% } else if (parseFloat(promedioConocimientos) >= 11) { %>
+        <div class="h-full rounded-full bg-sky-500" style="width: <%= pctCon %>%"></div>
+        <% } else { %>
+        <div class="h-full rounded-full bg-red-500" style="width: <%= pctCon %>%"></div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Comparación con Sección y General -->
+<div class="card-static mb-8">
+  <div class="flex items-center gap-2 mb-5">
+    <div class="icon-box bg-primary-100 text-primary-600">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+    </div>
+    <div>
+      <h2 class="section-title">Comparación de Promedios</h2>
+      <p class="text-xs text-slate-400">Tu rendimiento vs. sección (<%= estudiante.seccion ? estudiante.seccion.nombre : '' %>) vs. general</p>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="table-header">Categoría</th>
+          <th class="table-header text-center">Tú</th>
+          <th class="table-header text-center">Tu Sección</th>
+          <th class="table-header text-center">General</th>
+          <th class="table-header text-center">Diferencia</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <tr class="hover:bg-slate-50">
+          <td class="table-cell font-medium text-slate-800">Promedio General</td>
+          <td class="table-cell text-center">
+            <span class="text-lg font-bold <%= parseFloat(promedioGeneral) >= 11 ? 'text-emerald-600' : 'text-red-500' %>"><%= promedioGeneral %></span>
+          </td>
+          <td class="table-cell text-center text-sm font-medium text-slate-600"><%= promediosSeccion.general %></td>
+          <td class="table-cell text-center text-sm font-medium text-slate-600"><%= promediosGlobal.general %></td>
+          <td class="table-cell text-center">
+            <% const diffGen = (parseFloat(promedioGeneral) - parseFloat(promediosGlobal.general)).toFixed(2); %>
+            <% if (parseFloat(diffGen) > 0) { %>
+            <span class="text-sm font-bold text-emerald-600">+<%= diffGen %></span>
+            <% } else if (parseFloat(diffGen) < 0) { %>
+            <span class="text-sm font-bold text-red-500"><%= diffGen %></span>
+            <% } else { %>
+            <span class="text-sm font-bold text-slate-400">0.00</span>
+            <% } %>
+          </td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="table-cell font-medium text-slate-800">📘 Aptitud</td>
+          <td class="table-cell text-center">
+            <span class="text-lg font-bold <%= parseFloat(promedioAptitud) >= 11 ? 'text-emerald-600' : 'text-red-500' %>"><%= promedioAptitud %></span>
+          </td>
+          <td class="table-cell text-center text-sm font-medium text-slate-600"><%= promediosSeccion.aptitud %></td>
+          <td class="table-cell text-center text-sm font-medium text-slate-600"><%= promediosGlobal.aptitud %></td>
+          <td class="table-cell text-center">
+            <% const diffApt = (parseFloat(promedioAptitud) - parseFloat(promediosGlobal.aptitud)).toFixed(2); %>
+            <% if (parseFloat(diffApt) > 0) { %>
+            <span class="text-sm font-bold text-emerald-600">+<%= diffApt %></span>
+            <% } else if (parseFloat(diffApt) < 0) { %>
+            <span class="text-sm font-bold text-red-500"><%= diffApt %></span>
+            <% } else { %>
+            <span class="text-sm font-bold text-slate-400">0.00</span>
+            <% } %>
+          </td>
+        </tr>
+        <tr class="hover:bg-slate-50">
+          <td class="table-cell font-medium text-slate-800">📗 Conocimientos</td>
+          <td class="table-cell text-center">
+            <span class="text-lg font-bold <%= parseFloat(promedioConocimientos) >= 11 ? 'text-emerald-600' : 'text-red-500' %>"><%= promedioConocimientos %></span>
+          </td>
+          <td class="table-cell text-center text-sm font-medium text-slate-600"><%= promediosSeccion.conocimientos %></td>
+          <td class="table-cell text-center text-sm font-medium text-slate-600"><%= promediosGlobal.conocimientos %></td>
+          <td class="table-cell text-center">
+            <% const diffCon = (parseFloat(promedioConocimientos) - parseFloat(promediosGlobal.conocimientos)).toFixed(2); %>
+            <% if (parseFloat(diffCon) > 0) { %>
+            <span class="text-sm font-bold text-emerald-600">+<%= diffCon %></span>
+            <% } else if (parseFloat(diffCon) < 0) { %>
+            <span class="text-sm font-bold text-red-500"><%= diffCon %></span>
+            <% } else { %>
+            <span class="text-sm font-bold text-slate-400">0.00</span>
+            <% } %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Gráfico de comparación -->
+<div class="card-static mb-8">
+  <div class="flex items-center gap-2 mb-5">
+    <div class="icon-box bg-purple-100 text-purple-600">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/></svg>
+    </div>
+    <h2 class="section-title">Gráfico Comparativo</h2>
+  </div>
+  <div class="relative h-72">
+    <canvas id="chartComparativo"></canvas>
+  </div>
+</div>
+
+<!-- Detalle por examen -->
+<div class="card-static">
+  <div class="flex items-center gap-2 mb-5">
+    <div class="icon-box bg-blue-100 text-blue-600">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+    </div>
+    <div>
+      <h2 class="section-title">Detalle por Examen</h2>
+      <p class="text-xs text-slate-400">Notas individuales con tendencia</p>
+    </div>
+  </div>
+
+  <div class="relative h-64 mb-6">
+    <canvas id="chartDetalle"></canvas>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="table-header">Examen</th>
+          <th class="table-header">Tipo</th>
+          <th class="table-header">Fecha</th>
+          <th class="table-header text-center">C / I / B</th>
+          <th class="table-header text-right">Nota</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100" id="tabla-detalle">
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% } %>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+<% if (totalExamenes > 0) { %>
+  const detalle = <%- detalleExamenes %>;
+  const promediosSeccion = <%- JSON.stringify(promediosSeccion) %>;
+  const promediosGlobal = <%- JSON.stringify(promediosGlobal) %>;
+  const promedioGeneral = <%= promedioGeneral %>;
+  const promedioAptitud = <%= promedioAptitud %>;
+  const promedioConocimientos = <%= promedioConocimientos %>;
+
+  // Gráfico comparativo (barras)
+  const ctxComp = document.getElementById('chartComparativo').getContext('2d');
+  new Chart(ctxComp, {
+    type: 'bar',
+    data: {
+      labels: ['General', 'Aptitud', 'Conocimientos'],
+      datasets: [
+        {
+          label: 'Tú',
+          data: [promedioGeneral, promedioAptitud, promedioConocimientos],
+          backgroundColor: 'rgba(79, 70, 229, 0.8)',
+          borderRadius: 6
+        },
+        {
+          label: 'Tu Sección',
+          data: [parseFloat(promediosSeccion.general), parseFloat(promediosSeccion.aptitud), parseFloat(promediosSeccion.conocimientos)],
+          backgroundColor: 'rgba(14, 165, 233, 0.6)',
+          borderRadius: 6
+        },
+        {
+          label: 'General',
+          data: [parseFloat(promediosGlobal.general), parseFloat(promediosGlobal.aptitud), parseFloat(promediosGlobal.conocimientos)],
+          backgroundColor: 'rgba(148, 163, 184, 0.5)',
+          borderRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { font: { family: 'Inter', size: 12 }, usePointStyle: true } }
+      },
+      scales: {
+        y: { beginAtZero: true, max: 20, grid: { color: '#f1f5f9' } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Gráfico detalle por examen (línea)
+  const ctxDet = document.getElementById('chartDetalle').getContext('2d');
+  new Chart(ctxDet, {
+    type: 'line',
+    data: {
+      labels: detalle.map(d => d.examen),
+      datasets: [{
+        label: 'Nota Vigesimal',
+        data: detalle.map(d => d.nota),
+        borderColor: '#4f46e5',
+        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 5,
+        pointBackgroundColor: detalle.map(d => d.nota >= 14 ? '#10b981' : d.nota >= 11 ? '#0ea5e9' : '#ef4444'),
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, max: 20, grid: { color: '#f1f5f9' } },
+        x: { grid: { display: false }, ticks: { font: { size: 10 }, maxRotation: 45 } }
+      }
+    }
+  });
+
+  // Llenar tabla detalle
+  const tbody = document.getElementById('tabla-detalle');
+  detalle.forEach(d => {
+    const nota = d.nota;
+    let colorClass = 'text-red-500';
+    if (nota >= 14) colorClass = 'text-emerald-600';
+    else if (nota >= 11) colorClass = 'text-sky-600';
+
+    const fecha = new Date(d.fecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' });
+    const tipoLabel = d.tipo === 'aptitud' ? '<span class="badge-blue text-xs">Aptitud</span>' : '<span class="badge-green text-xs">Conocimientos</span>';
+
+    tbody.innerHTML += `
+      <tr class="hover:bg-slate-50">
+        <td class="table-cell font-medium text-slate-800">${d.examen}</td>
+        <td class="table-cell">${tipoLabel}</td>
+        <td class="table-cell text-slate-500">${fecha}</td>
+        <td class="table-cell text-center">
+          <span class="text-emerald-600 font-medium">${d.correctas}</span>
+          <span class="text-slate-300 mx-0.5">/</span>
+          <span class="text-red-500 font-medium">${d.incorrectas}</span>
+          <span class="text-slate-300 mx-0.5">/</span>
+          <span class="text-slate-400">${d.en_blanco}</span>
+        </td>
+        <td class="table-cell text-right">
+          <span class="text-base font-bold ${colorClass}">${nota.toFixed(2)}</span>
+        </td>
+      </tr>
+    `;
+  });
+<% } %>
+</script>

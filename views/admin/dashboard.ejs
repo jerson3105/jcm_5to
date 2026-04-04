@@ -1,0 +1,141 @@
+<!-- Admin Dashboard -->
+<div class="hidden lg:block mb-8">
+  <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Panel de Administración</h1>
+  <p class="text-slate-500 mt-1">Bienvenido de vuelta, <span class="font-medium text-primary-700"><%= user.nombre %></span></p>
+</div>
+
+<!-- Stat Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+  <!-- Estudiantes -->
+  <div class="stat-card group">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Estudiantes</span>
+      <div class="icon-box bg-primary-100 text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </div>
+    </div>
+    <p class="text-3xl font-extrabold text-slate-800"><%= stats.totalEstudiantes %></p>
+    <p class="text-xs text-slate-400 mt-1">Registrados en el sistema</p>
+  </div>
+
+  <!-- Exámenes -->
+  <div class="stat-card group">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Exámenes</span>
+      <div class="icon-box bg-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+    </div>
+    <p class="text-3xl font-extrabold text-slate-800"><%= stats.totalExamenes %></p>
+    <p class="text-xs text-slate-400 mt-1">Exámenes registrados</p>
+  </div>
+
+  <!-- Promedio General -->
+  <div class="stat-card group">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Promedio General</span>
+      <div class="icon-box bg-gold-100 text-gold-600 group-hover:bg-gold-500 group-hover:text-white transition-colors duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      </div>
+    </div>
+    <p class="text-3xl font-extrabold text-slate-800"><%= stats.promedioGeneral || '--' %></p>
+    <p class="text-xs text-slate-400 mt-1">Escala vigesimal</p>
+  </div>
+
+  <!-- Secciones -->
+  <div class="stat-card group">
+    <div class="flex items-center justify-between mb-3">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Secciones</span>
+      <div class="icon-box bg-accent-100 text-accent-600 group-hover:bg-accent-600 group-hover:text-white transition-colors duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+      </div>
+    </div>
+    <p class="text-3xl font-extrabold text-slate-800"><%= stats.totalSecciones %></p>
+    <p class="text-xs text-slate-400 mt-1">Secciones activas</p>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+  <!-- Quick Actions -->
+  <div class="lg:col-span-2">
+    <div class="card-static">
+      <div class="flex items-center gap-2 mb-5">
+        <div class="icon-box bg-primary-100 text-primary-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h2 class="section-title">Acciones rápidas</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <a href="/admin/secciones" class="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:bg-primary-50/50 hover:shadow-sm transition-all duration-200 group">
+          <div class="icon-box bg-primary-100 text-primary-600 group-hover:bg-primary-600 group-hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-700">Configurar Secciones</p>
+            <p class="text-xs text-slate-400">Crear secciones del 5to año</p>
+          </div>
+        </a>
+        <a href="/admin/areas" class="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:bg-primary-50/50 hover:shadow-sm transition-all duration-200 group">
+          <div class="icon-box bg-gold-100 text-gold-600 group-hover:bg-gold-500 group-hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-700">Configurar Áreas</p>
+            <p class="text-xs text-slate-400">Definir áreas y carreras</p>
+          </div>
+        </a>
+        <a href="/admin/estudiantes" class="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:bg-primary-50/50 hover:shadow-sm transition-all duration-200 group">
+          <div class="icon-box bg-emerald-100 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-700">Agregar Estudiantes</p>
+            <p class="text-xs text-slate-400">Individual o masivo (Excel)</p>
+          </div>
+        </a>
+        <a href="/admin/resultados" class="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-primary-300 hover:bg-primary-50/50 hover:shadow-sm transition-all duration-200 group">
+          <div class="icon-box bg-accent-100 text-accent-600 group-hover:bg-accent-600 group-hover:text-white transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-slate-700">Cargar Resultados</p>
+            <p class="text-xs text-slate-400">Importar notas de exámenes</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Últimos Exámenes -->
+  <div>
+    <div class="card-static h-full">
+      <div class="flex items-center gap-2 mb-5">
+        <div class="icon-box bg-emerald-100 text-emerald-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+        <h2 class="section-title">Últimos Exámenes</h2>
+      </div>
+      <% if (ultimosExamenes && ultimosExamenes.length > 0) { %>
+      <div class="space-y-3">
+        <% ultimosExamenes.forEach(function(ex) { %>
+        <div class="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-slate-100 transition-colors">
+          <div class="w-2 h-2 rounded-full bg-primary-500 shrink-0"></div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-slate-700 truncate"><%= ex.tipo %></p>
+            <p class="text-xs text-slate-400"><%= new Date(ex.fecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) %></p>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <% } else { %>
+      <div class="flex flex-col items-center justify-center py-8 text-center">
+        <div class="icon-box bg-slate-100 text-slate-400 mb-3 w-12 h-12 rounded-xl">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <p class="text-sm text-slate-400">Sin exámenes registrados</p>
+        <a href="/admin/examenes" class="text-xs text-primary-600 hover:text-primary-700 font-medium mt-1">Crear primer examen</a>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</div>

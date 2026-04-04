@@ -1,0 +1,178 @@
+<!-- Padres de Familia CRUD -->
+<div class="hidden lg:block mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Padres de Familia</h1>
+      <p class="text-slate-500 mt-1">Gestiona las cuentas de padres y sus vínculos con estudiantes</p>
+    </div>
+    <button onclick="document.getElementById('modal-crear').classList.remove('hidden')" class="btn-primary">
+      <svg class="w-5 h-5 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+      Nuevo Padre
+    </button>
+  </div>
+</div>
+
+<div class="lg:hidden mb-4">
+  <button onclick="document.getElementById('modal-crear').classList.remove('hidden')" class="btn-primary w-full">Nuevo Padre</button>
+</div>
+
+<!-- Lista de padres -->
+<div class="card">
+  <% if (padres.length === 0) { %>
+  <div class="text-center py-8">
+    <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+    <p class="text-sm text-slate-400">No hay padres registrados</p>
+  </div>
+  <% } else { %>
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="border-b border-slate-200">
+        <tr>
+          <th class="table-header">Nombre</th>
+          <th class="table-header">Email</th>
+          <th class="table-header">Hijos vinculados</th>
+          <th class="table-header">Estado</th>
+          <th class="table-header text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% padres.forEach(padre => { %>
+        <tr class="hover:bg-slate-50">
+          <td class="table-cell font-medium"><%= padre.usuario.nombre %></td>
+          <td class="table-cell text-slate-500"><%= padre.usuario.email %></td>
+          <td class="table-cell">
+            <% if (padre.estudiantes && padre.estudiantes.length > 0) { %>
+              <div class="flex flex-wrap gap-1">
+                <% padre.estudiantes.forEach(est => { %>
+                <span class="badge-blue"><%= est.usuario.nombre %></span>
+                <% }) %>
+              </div>
+            <% } else { %>
+              <span class="text-slate-400 text-sm">Sin hijos vinculados</span>
+            <% } %>
+          </td>
+          <td class="table-cell">
+            <% if (padre.usuario.activo) { %>
+              <span class="badge-green">Activo</span>
+            <% } else { %>
+              <span class="badge-red">Inactivo</span>
+            <% } %>
+          </td>
+          <td class="table-cell text-right">
+            <button onclick='abrirEditarPadre(<%- JSON.stringify({id: padre.id, nombre: padre.usuario.nombre, email: padre.usuario.email, activo: padre.usuario.activo, estudiantes: padre.estudiantes ? padre.estudiantes.map(e => e.id) : []}) %>)' class="text-primary-600 hover:text-primary-800 text-sm font-medium mr-2">Editar</button>
+            <form action="/admin/padres/<%= padre.id %>/delete" method="POST" class="inline" onsubmit="return confirm('¿Eliminar este padre?')">
+              <button type="submit" class="text-red-600 hover:text-red-800 text-sm font-medium">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <p class="text-xs text-slate-400 mt-3"><%= padres.length %> padre(s) registrado(s)</p>
+  <% } %>
+</div>
+
+<!-- Modal Crear Padre -->
+<div id="modal-crear" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('modal-crear').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-semibold text-slate-800">Nuevo Padre de Familia</h2>
+      <button onclick="document.getElementById('modal-crear').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form action="/admin/padres" method="POST" class="space-y-4">
+      <div>
+        <label class="input-label">Nombre completo *</label>
+        <input type="text" name="nombre" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">Correo electrónico *</label>
+        <input type="email" name="email" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">Contraseña</label>
+        <input type="text" name="password" class="input-field" placeholder="Dejar vacío = padre123">
+      </div>
+      <div>
+        <label class="input-label">Vincular con estudiantes</label>
+        <div class="max-h-48 overflow-y-auto border border-slate-200 rounded-lg p-3 space-y-2">
+          <% if (estudiantesList.length === 0) { %>
+            <p class="text-sm text-slate-400">No hay estudiantes registrados</p>
+          <% } else { %>
+            <% estudiantesList.forEach(est => { %>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="estudiantes_ids" value="<%= est.id %>" class="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+              <span class="text-sm text-slate-700"><%= est.usuario.nombre %></span>
+              <span class="text-xs text-slate-400">(<%= est.seccion ? est.seccion.nombre : '' %>)</span>
+            </label>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary flex-1">Crear Padre</button>
+        <button type="button" onclick="document.getElementById('modal-crear').classList.add('hidden')" class="btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Editar Padre -->
+<div id="modal-editar" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('modal-editar').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-semibold text-slate-800">Editar Padre</h2>
+      <button onclick="document.getElementById('modal-editar').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form id="form-editar-padre" method="POST" class="space-y-4">
+      <div>
+        <label class="input-label">Nombre completo *</label>
+        <input type="text" name="nombre" id="ep-nombre" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">Correo electrónico *</label>
+        <input type="email" name="email" id="ep-email" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">Vincular con estudiantes</label>
+        <div class="max-h-48 overflow-y-auto border border-slate-200 rounded-lg p-3 space-y-2" id="ep-estudiantes">
+          <% estudiantesList.forEach(est => { %>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" name="estudiantes_ids" value="<%= est.id %>" class="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 ep-check">
+            <span class="text-sm text-slate-700"><%= est.usuario.nombre %></span>
+            <span class="text-xs text-slate-400">(<%= est.seccion ? est.seccion.nombre : '' %>)</span>
+          </label>
+          <% }) %>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" name="activo" id="ep-activo" value="on" class="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+        <label for="ep-activo" class="text-sm text-slate-700">Cuenta activa</label>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary flex-1">Guardar Cambios</button>
+        <button type="button" onclick="document.getElementById('modal-editar').classList.add('hidden')" class="btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function abrirEditarPadre(data) {
+  document.getElementById('form-editar-padre').action = '/admin/padres/' + data.id + '/update';
+  document.getElementById('ep-nombre').value = data.nombre;
+  document.getElementById('ep-email').value = data.email;
+  document.getElementById('ep-activo').checked = data.activo;
+  // Marcar checkboxes de estudiantes vinculados
+  document.querySelectorAll('.ep-check').forEach(cb => {
+    cb.checked = data.estudiantes.includes(parseInt(cb.value));
+  });
+  document.getElementById('modal-editar').classList.remove('hidden');
+}
+</script>

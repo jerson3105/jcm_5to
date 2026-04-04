@@ -1,0 +1,298 @@
+<!-- Rankings -->
+<div class="hidden lg:block mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Rankings</h1>
+      <p class="text-slate-500 mt-1">Clasificación de estudiantes por rendimiento</p>
+    </div>
+    <% if (rankingData.length > 0) { %>
+    <button onclick="imprimirRanking()" class="btn-secondary print:hidden">
+      <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+      Imprimir PDF
+    </button>
+    <% } %>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="card-static mb-6 print:hidden">
+  <form method="GET" action="/admin/rankings" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+    <div>
+      <label class="input-label">Examen</label>
+      <select name="examen_id" class="input-field text-sm" onchange="this.form.submit()">
+        <option value="">Promedio General</option>
+        <% examenes.forEach(function(e) { %>
+        <option value="<%= e.id %>" <%= filtros.examen_id == e.id ? 'selected' : '' %>>
+          <%= e.tipo === 'aptitud' ? '📘' : '📗' %> <%= e.descripcion || (e.tipo === 'aptitud' ? 'Aptitud' : 'Conocimientos') %> — <%= new Date(e.fecha).toLocaleDateString('es-PE', { day: '2-digit', month: 'short', year: 'numeric' }) %>
+        </option>
+        <% }); %>
+      </select>
+    </div>
+    <div>
+      <label class="input-label">Sección</label>
+      <select name="seccion_id" class="input-field text-sm" onchange="this.form.submit()">
+        <option value="">Todas</option>
+        <% secciones.forEach(function(s) { %>
+        <option value="<%= s.id %>" <%= filtros.seccion_id == s.id ? 'selected' : '' %>><%= s.nombre %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div>
+      <label class="input-label">Área</label>
+      <select name="area_id" class="input-field text-sm" onchange="this.form.submit()">
+        <option value="">Todas</option>
+        <% areas.forEach(function(a) { %>
+        <option value="<%= a.id %>" <%= filtros.area_id == a.id ? 'selected' : '' %>><%= a.nombre %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div>
+      <a href="/admin/rankings" class="btn-secondary text-center w-full text-sm">
+        <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Limpiar filtros
+      </a>
+    </div>
+  </form>
+</div>
+
+<!-- Stats -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6 print:hidden">
+  <div class="card-static !p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500">Estudiantes</p>
+        <p class="text-xl font-extrabold text-slate-800"><%= stats.totalEstudiantes %></p>
+      </div>
+    </div>
+  </div>
+  <div class="card-static !p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500">Promedio</p>
+        <p class="text-xl font-extrabold text-emerald-700"><%= stats.promedioGlobal %></p>
+      </div>
+    </div>
+  </div>
+  <div class="card-static !p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gold-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500">Mejor Nota</p>
+        <p class="text-xl font-extrabold text-gold-700"><%= stats.mejorNota %></p>
+      </div>
+    </div>
+  </div>
+  <div class="card-static !p-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div>
+        <p class="text-xs text-slate-500">Aprobados</p>
+        <p class="text-xl font-extrabold text-purple-700"><%= stats.aprobados %>/<%= stats.totalEstudiantes %></p>
+        <p class="text-[10px] text-slate-400"><%= stats.totalEstudiantes > 0 ? ((stats.aprobados / stats.totalEstudiantes) * 100).toFixed(0) : 0 %>% del total</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (rankingData.length === 0) { %>
+<div class="card-static text-center py-16">
+  <div class="icon-box bg-primary-100 text-primary-300 mx-auto mb-4 w-16 h-16 rounded-2xl">
+    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+  </div>
+  <p class="text-sm font-medium text-slate-500">Sin datos de ranking</p>
+  <p class="text-xs text-slate-400 mt-1">No hay resultados para los filtros seleccionados</p>
+</div>
+<% } else { %>
+
+<!-- Podio Top 3 -->
+<% if (rankingData.length >= 3) { %>
+<div class="flex items-end justify-center gap-3 mb-6 print:hidden">
+  <%
+    const podioOrder = [1, 0, 2];
+    const podioHeights = ['h-36', 'h-44', 'h-32'];
+    const podioGradients = ['from-slate-200 to-slate-300', 'from-gold-300 to-gold-400', 'from-orange-200 to-orange-300'];
+    const podioTextColors = ['text-slate-700', 'text-gold-800', 'text-orange-700'];
+    const podioMedals = ['🥈', '🥇', '🥉'];
+    const podioBorder = ['border-slate-300', 'border-gold-400', 'border-orange-300'];
+  %>
+  <% podioOrder.forEach(function(idx, i) { const r = rankingData[idx]; %>
+  <div class="flex-1 max-w-[220px]">
+    <div class="text-center mb-3">
+      <div class="w-14 h-14 mx-auto rounded-full bg-white border-2 <%= podioBorder[i] %> flex items-center justify-center shadow-md mb-2">
+        <span class="text-2xl"><%= podioMedals[i] %></span>
+      </div>
+      <h4 class="font-bold text-slate-800 text-sm truncate px-2"><%= r.nombre %></h4>
+      <p class="text-[11px] text-slate-400 truncate"><%= r.seccion %></p>
+    </div>
+    <div class="<%= podioHeights[i] %> bg-gradient-to-t <%= podioGradients[i] %> rounded-t-2xl flex flex-col items-center justify-center relative">
+      <span class="text-3xl font-extrabold <%= podioTextColors[i] %>"><%= r.nota_vigesimal.toFixed(1) %></span>
+      <span class="text-xs <%= podioTextColors[i] %> opacity-70"><%= tipoRanking === 'examen' ? 'nota' : 'prom.' %></span>
+      <span class="absolute bottom-3 text-4xl font-black text-white/30"><%= r.posicion %></span>
+    </div>
+  </div>
+  <% }); %>
+</div>
+<% } %>
+
+<!-- Tabla de ranking completo (imprimible) -->
+<div id="ranking-printable" class="card-static">
+  <!-- Cabecera impresión (solo visible al imprimir) -->
+  <div class="hidden print:block mb-6">
+    <div class="text-center border-b-2 border-slate-800 pb-4">
+      <h1 class="text-xl font-bold">I.E. José Carlos Mariátegui — Ica</h1>
+      <h2 class="text-lg font-semibold mt-1">Ranking de Rendimiento Académico — 5to Año</h2>
+      <p class="text-sm text-slate-600 mt-1">
+        <% if (filtros.examen_id) { %>
+          Examen: <%= examenes.find(e => e.id == filtros.examen_id) ? (examenes.find(e => e.id == filtros.examen_id).descripcion || examenes.find(e => e.id == filtros.examen_id).tipo) : 'N/A' %>
+        <% } else { %>
+          Promedio General de todos los exámenes
+        <% } %>
+        <% if (filtros.seccion_id) { %> | Sección: <%= secciones.find(s => s.id == filtros.seccion_id) ? secciones.find(s => s.id == filtros.seccion_id).nombre : '' %><% } %>
+
+      </p>
+      <p class="text-xs text-slate-500 mt-1">Generado: <%= new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between mb-5 print:hidden">
+    <div class="flex items-center gap-2">
+      <div class="icon-box bg-gold-100 text-gold-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+      </div>
+      <div>
+        <h2 class="section-title">Ranking <%= tipoRanking === 'examen' ? 'por Examen' : 'General (Promedio)' %></h2>
+        <p class="text-xs text-slate-400"><%= rankingData.length %> estudiantes</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full" id="tabla-ranking">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="table-header w-14">#</th>
+          <th class="table-header">Estudiante</th>
+          <th class="table-header">Sección</th>
+
+          <% if (tipoRanking === 'examen') { %>
+          <th class="table-header text-center">C / I / B</th>
+          <th class="table-header text-center">P. Bruto</th>
+          <% } else { %>
+          <th class="table-header text-center">Exámenes</th>
+          <% } %>
+          <th class="table-header text-right"><%= tipoRanking === 'examen' ? 'Nota' : 'Promedio' %></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% rankingData.forEach(function(r, idx) {
+          const nota = r.nota_vigesimal;
+          const notaPct = Math.min((nota / 20) * 100, 100);
+          let notaTextColor = 'text-red-500';
+          if (nota >= 15) notaTextColor = 'text-emerald-600';
+          else if (nota >= 10.5) notaTextColor = 'text-sky-600';
+          else if (nota >= 5) notaTextColor = 'text-orange-500';
+        %>
+        <tr class="hover:bg-slate-50/80 transition-colors">
+          <td class="table-cell">
+            <% if (r.posicion === 1) { %>
+            <span class="w-8 h-8 rounded-full bg-gold-100 text-gold-700 flex items-center justify-center text-xs font-bold">1°</span>
+            <% } else if (r.posicion === 2) { %>
+            <span class="w-8 h-8 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold">2°</span>
+            <% } else if (r.posicion === 3) { %>
+            <span class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold">3°</span>
+            <% } else { %>
+            <span class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center text-xs font-medium"><%= r.posicion %>°</span>
+            <% } %>
+          </td>
+          <td class="table-cell">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center text-xs font-bold shrink-0 print:hidden">
+                <%= r.nombre.charAt(0).toUpperCase() %>
+              </div>
+              <div>
+                <span class="font-semibold text-slate-800 text-sm"><%= r.nombre %></span>
+                <% if (r.carrera) { %><p class="text-[11px] text-slate-400 print:hidden"><%= r.carrera %></p><% } %>
+              </div>
+            </div>
+          </td>
+          <td class="table-cell"><span class="badge-blue text-xs"><%= r.seccion %></span></td>
+
+          <% if (tipoRanking === 'examen') { %>
+          <td class="table-cell text-center">
+            <span class="text-emerald-600 font-medium text-sm"><%= r.correctas %></span>
+            <span class="text-slate-300 mx-0.5">/</span>
+            <span class="text-red-500 font-medium text-sm"><%= r.incorrectas %></span>
+            <span class="text-slate-300 mx-0.5">/</span>
+            <span class="text-slate-400 text-sm"><%= r.en_blanco %></span>
+          </td>
+          <td class="table-cell text-center">
+            <span class="font-mono text-sm text-slate-600"><%= r.puntaje_bruto.toFixed(2) %></span>
+          </td>
+          <% } else { %>
+          <td class="table-cell text-center"><span class="badge-blue text-xs"><%= r.total_examenes %></span></td>
+          <% } %>
+          <td class="table-cell text-right">
+            <div class="flex flex-col items-end gap-1">
+              <span class="text-base font-bold <%= notaTextColor %>"><%= nota.toFixed(2) %></span>
+              <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden print:hidden">
+                <% if (nota >= 15) { %>
+                <div class="h-full rounded-full bg-emerald-500" style="width: <%= notaPct %>%"></div>
+                <% } else if (nota >= 10.5) { %>
+                <div class="h-full rounded-full bg-sky-500" style="width: <%= notaPct %>%"></div>
+                <% } else if (nota >= 5) { %>
+                <div class="h-full rounded-full bg-orange-400" style="width: <%= notaPct %>%"></div>
+                <% } else { %>
+                <div class="h-full rounded-full bg-red-500" style="width: <%= notaPct %>%"></div>
+                <% } %>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pie de impresión -->
+  <div class="hidden print:block mt-8 pt-4 border-t border-slate-300">
+    <div class="flex justify-between text-xs text-slate-500">
+      <span>Total: <%= rankingData.length %> estudiantes | Aprobados (≥10.5): <%= stats.aprobados %> (<%= stats.totalEstudiantes > 0 ? ((stats.aprobados / stats.totalEstudiantes) * 100).toFixed(0) : 0 %>%)</span>
+      <span>Promedio general: <%= stats.promedioGlobal %></span>
+    </div>
+    <div class="flex justify-between text-xs text-slate-400 mt-4">
+      <div class="border-t border-slate-400 pt-1 w-48 text-center">Firma del Director(a)</div>
+      <div class="border-t border-slate-400 pt-1 w-48 text-center">Firma del Coordinador(a)</div>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<script>
+function imprimirRanking() {
+  window.print();
+}
+</script>
+
+<style>
+@media print {
+  /* Ocultar sidebar, header, nav */
+  .sidebar-scroll, nav, header, .lg\\:ml-64 { margin-left: 0 !important; }
+  body > *:not(.print-area) { }
+  @page { size: A4 portrait; margin: 15mm; }
+  .card-static { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+  .badge-blue, .badge-green { border: 1px solid #cbd5e1; background: #f8fafc !important; color: #334155 !important; }
+  table { font-size: 11px; }
+  .table-header { padding: 6px 8px !important; }
+  .table-cell { padding: 5px 8px !important; }
+}
+</style>

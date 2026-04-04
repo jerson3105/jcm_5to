@@ -1,0 +1,386 @@
+<!-- Estudiantes CRUD -->
+<div class="hidden lg:block mb-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Estudiantes</h1>
+      <p class="text-slate-500 mt-1">Gestiona los estudiantes del 5to año</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="document.getElementById('modal-importar').classList.remove('hidden')" class="btn-secondary">
+        <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+        Carga Masiva
+      </button>
+      <button onclick="document.getElementById('modal-crear').classList.remove('hidden')" class="btn-success">
+        <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        Nuevo Estudiante
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Botones mobile -->
+<div class="lg:hidden mb-4 flex gap-2">
+  <button onclick="document.getElementById('modal-importar').classList.remove('hidden')" class="btn-secondary flex-1 text-sm">
+    <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+    Carga Masiva
+  </button>
+  <button onclick="document.getElementById('modal-crear').classList.remove('hidden')" class="btn-success flex-1 text-sm">
+    <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+    Nuevo
+  </button>
+</div>
+
+<!-- Errores de importación -->
+<% if (locals.importErrors && importErrors && importErrors.length > 0) { %>
+<div class="mb-6 p-4 rounded-xl bg-gold-50 border border-gold-200 text-gold-800 text-sm">
+  <div class="flex items-center gap-2 mb-2">
+    <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+    <strong>Filas con errores en la importación:</strong>
+  </div>
+  <ul class="list-disc list-inside ml-6 space-y-1">
+    <% importErrors.forEach(err => { %>
+    <li>Fila <%= err.fila %>: <%= err.error %></li>
+    <% }) %>
+  </ul>
+</div>
+<% } %>
+
+<!-- Tabla de estudiantes -->
+<div class="card-static">
+  <% if (estudiantes.length === 0) { %>
+  <div class="text-center py-12">
+    <div class="icon-box bg-emerald-100 text-emerald-400 mx-auto mb-3 w-14 h-14 rounded-2xl">
+      <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+    </div>
+    <p class="text-sm font-medium text-slate-500">No hay estudiantes registrados</p>
+    <p class="text-xs text-slate-400 mt-1">Agrega uno manualmente o usa la carga masiva</p>
+  </div>
+  <% } else { %>
+  <div class="flex items-center justify-between mb-5">
+    <div class="flex items-center gap-2">
+      <div class="icon-box bg-emerald-100 text-emerald-600">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </div>
+      <div>
+        <h2 class="section-title">Lista de estudiantes</h2>
+        <p class="text-xs text-slate-400"><%= estudiantes.length %> registrado(s)</p>
+      </div>
+    </div>
+    <div class="relative">
+      <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      <input type="text" id="buscar" class="input-field pl-9 w-64" placeholder="Buscar por nombre o DNI..." oninput="filtrarTabla()">
+    </div>
+  </div>
+  <div class="overflow-x-auto">
+    <table class="w-full" id="tabla-estudiantes">
+      <thead>
+        <tr class="border-b border-slate-200">
+          <th class="table-header">Nombre</th>
+          <th class="table-header">DNI</th>
+          <th class="table-header">Sección</th>
+          <th class="table-header">Carrera</th>
+          <th class="table-header text-right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        <% estudiantes.forEach(est => { %>
+        <tr class="hover:bg-slate-50/80 transition-colors fila-estudiante">
+          <td class="table-cell">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">
+                <%= est.usuario.nombre.charAt(0).toUpperCase() %>
+              </div>
+              <span class="font-semibold text-slate-800"><%= est.usuario.nombre %></span>
+            </div>
+          </td>
+          <td class="table-cell">
+            <span class="font-mono text-sm text-slate-600"><%= est.dni %></span>
+          </td>
+          <td class="table-cell">
+            <span class="badge-blue text-xs"><%= est.seccion ? est.seccion.nombre : '-' %></span>
+          </td>
+          <td class="table-cell">
+            <span class="text-sm <%= est.carrera ? 'text-slate-600' : 'text-slate-300' %>"><%= est.carrera ? est.carrera.nombre : '—' %></span>
+          </td>
+          <td class="table-cell text-right">
+            <div class="flex items-center justify-end gap-1">
+              <button onclick='abrirEditar(<%- JSON.stringify({id: est.id, nombre: est.usuario.nombre, email: est.usuario.email, dni: est.dni, seccion_id: est.seccion_id, area_id: est.area_id, carrera_id: est.carrera_id, activo: est.usuario.activo}) %>)' class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors" title="Editar">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+              </button>
+              <form action="/admin/estudiantes/<%= est.id %>/reset-password" method="POST" class="inline" onsubmit="return confirm('¿Restablecer contraseña de «<%= est.usuario.nombre %>» a su DNI?')">
+                <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-colors" title="Reset contraseña">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                </button>
+              </form>
+              <form action="/admin/estudiantes/<%= est.id %>/delete" method="POST" class="inline" onsubmit="return confirm('¿Eliminar a «<%= est.usuario.nombre %>»? Se perderán sus datos.')">
+                <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-accent-600 hover:bg-accent-50 transition-colors" title="Eliminar">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+
+<!-- Modal Crear Estudiante -->
+<div id="modal-crear" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('modal-crear').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-semibold text-slate-800">Nuevo Estudiante</h2>
+      <button onclick="document.getElementById('modal-crear').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form action="/admin/estudiantes" method="POST" class="space-y-4">
+      <div>
+        <label class="input-label">Nombre completo *</label>
+        <input type="text" name="nombre" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">Correo electrónico *</label>
+        <input type="email" name="email" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">DNI (código) *</label>
+        <input type="text" name="dni" class="input-field" maxlength="20" required>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="input-label">Sección *</label>
+          <select name="seccion_id" class="input-field" required>
+            <option value="">Seleccionar...</option>
+            <% secciones.forEach(s => { %>
+            <option value="<%= s.id %>"><%= s.nombre %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label class="input-label">Área</label>
+          <select name="area_id" class="input-field" onchange="filtrarCarreras(this.value, 'crear-carrera')">
+            <option value="">Sin asignar</option>
+            <% areas.forEach(a => { %>
+            <option value="<%= a.id %>"><%= a.nombre %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="input-label">Carrera referencial</label>
+        <select name="carrera_id" id="crear-carrera" class="input-field">
+          <option value="">Seleccionar...</option>
+          <% carreras.forEach(c => { %>
+          <option value="<%= c.id %>" data-area="<%= c.area_id %>"><%= c.nombre %> (<%= c.area ? c.area.nombre : '' %>)</option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label class="input-label">Contraseña</label>
+        <input type="text" name="password" class="input-field" placeholder="Dejar vacío = DNI como contraseña">
+        <p class="text-xs text-slate-400 mt-1">Si se deja vacío, la contraseña será el DNI del estudiante.</p>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary flex-1">Crear Estudiante</button>
+        <button type="button" onclick="document.getElementById('modal-crear').classList.add('hidden')" class="btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Editar Estudiante -->
+<div id="modal-editar" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('modal-editar').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-semibold text-slate-800">Editar Estudiante</h2>
+      <button onclick="document.getElementById('modal-editar').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form id="form-editar" method="POST" class="space-y-4">
+      <div>
+        <label class="input-label">Nombre completo *</label>
+        <input type="text" name="nombre" id="edit-nombre" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">Correo electrónico *</label>
+        <input type="email" name="email" id="edit-email" class="input-field" required>
+      </div>
+      <div>
+        <label class="input-label">DNI *</label>
+        <input type="text" name="dni" id="edit-dni" class="input-field" maxlength="20" required>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="input-label">Sección *</label>
+          <select name="seccion_id" id="edit-seccion" class="input-field" required>
+            <% secciones.forEach(s => { %>
+            <option value="<%= s.id %>"><%= s.nombre %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div>
+          <label class="input-label">Área</label>
+          <select name="area_id" id="edit-area" class="input-field" onchange="filtrarCarreras(this.value, 'edit-carrera')">
+            <option value="">Sin asignar</option>
+            <% areas.forEach(a => { %>
+            <option value="<%= a.id %>"><%= a.nombre %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="input-label">Carrera referencial</label>
+        <select name="carrera_id" id="edit-carrera" class="input-field">
+          <option value="">Sin asignar</option>
+          <% carreras.forEach(c => { %>
+          <option value="<%= c.id %>" data-area="<%= c.area_id %>"><%= c.nombre %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="flex items-center gap-2">
+        <input type="checkbox" name="activo" id="edit-activo" value="on" class="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500">
+        <label for="edit-activo" class="text-sm text-slate-700">Cuenta activa</label>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-primary flex-1">Guardar Cambios</button>
+        <button type="button" onclick="document.getElementById('modal-editar').classList.add('hidden')" class="btn-secondary">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Importar Estudiantes -->
+<div id="modal-importar" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+  <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('modal-importar').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-xl shadow-lg max-w-lg w-full max-h-[90vh] overflow-y-auto p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-semibold text-slate-800">Carga Masiva de Estudiantes</h2>
+      <button onclick="document.getElementById('modal-importar').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Paso 1: Descargar plantilla -->
+    <div class="mb-6 p-4 bg-primary-50 rounded-lg border border-primary-100">
+      <h3 class="text-sm font-semibold text-primary-800 mb-2">Paso 1: Descargar plantilla</h3>
+      <p class="text-xs text-primary-600 mb-3">La plantilla incluye hojas de referencia con las áreas y carreras disponibles.</p>
+      <a href="/admin/estudiantes/plantilla" class="btn-primary text-sm inline-flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Descargar Plantilla Excel
+      </a>
+    </div>
+
+    <!-- Paso 2: Seleccionar sección y subir archivo -->
+    <div class="mb-4">
+      <h3 class="text-sm font-semibold text-slate-800 mb-2">Paso 2: Seleccionar sección y subir archivo</h3>
+      <form action="/admin/estudiantes/importar" method="POST" enctype="multipart/form-data" class="space-y-4">
+        <div>
+          <label class="input-label">Sección destino *</label>
+          <select name="seccion_id" class="input-field" required>
+            <option value="">Seleccionar sección...</option>
+            <% secciones.forEach(s => { %>
+            <option value="<%= s.id %>"><%= s.nombre %></option>
+            <% }) %>
+          </select>
+          <p class="text-xs text-slate-400 mt-1">Todos los estudiantes del archivo se asignarán a esta sección.</p>
+        </div>
+        <div>
+          <input type="file" name="archivo" accept=".xlsx,.xls,.csv" class="block w-full text-sm text-slate-500 file:mr-2 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100" required>
+        </div>
+        <button type="submit" id="btn-importar" class="btn-success w-full" onclick="iniciarImportacion()">Importar Estudiantes</button>
+        <div id="importar-loading" class="hidden mt-3">
+          <div class="flex items-center justify-center gap-3 p-3 bg-primary-50 rounded-lg border border-primary-100">
+            <svg class="w-5 h-5 text-primary-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <span class="text-sm font-medium text-primary-700">Procesando archivo, por favor espere...</span>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Info -->
+    <div class="p-3 bg-slate-50 rounded-lg">
+      <p class="text-xs font-medium text-slate-600 mb-2">Columnas requeridas:</p>
+      <div class="overflow-x-auto">
+        <table class="text-xs text-slate-500 w-full">
+          <thead><tr>
+            <th class="text-left pr-2 pb-1 text-slate-600">nombre</th>
+            <th class="text-left pr-2 pb-1 text-slate-600">email</th>
+            <th class="text-left pr-2 pb-1 text-slate-600">dni</th>
+            <th class="text-left pr-2 pb-1 text-slate-600">area</th>
+            <th class="text-left pb-1 text-slate-600">carrera</th>
+          </tr></thead>
+          <tbody><tr>
+            <td class="pr-2">Juan Pérez</td>
+            <td class="pr-2">juan@mail.com</td>
+            <td class="pr-2">72345678</td>
+            <td class="pr-2">Área A</td>
+            <td>Ing. Civil</td>
+          </tr></tbody>
+        </table>
+      </div>
+      <ul class="text-xs text-slate-400 mt-2 space-y-1">
+        <li>• La <strong>sección</strong> se selecciona arriba, no va en el Excel</li>
+        <li>• Los nombres de área y carrera deben coincidir con los registrados</li>
+        <li>• La contraseña de cada estudiante será su DNI</li>
+        <li>• Las columnas <strong>area</strong> y <strong>carrera</strong> son opcionales</li>
+        <li>• DNIs y emails duplicados se reportarán como errores</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+function abrirEditar(data) {
+  document.getElementById('form-editar').action = '/admin/estudiantes/' + data.id + '/update';
+  document.getElementById('edit-nombre').value = data.nombre;
+  document.getElementById('edit-email').value = data.email;
+  document.getElementById('edit-dni').value = data.dni;
+  document.getElementById('edit-seccion').value = data.seccion_id;
+  document.getElementById('edit-area').value = data.area_id;
+  filtrarCarreras(data.area_id, 'edit-carrera');
+  if (data.carrera_id) {
+    document.getElementById('edit-carrera').value = data.carrera_id;
+  }
+  document.getElementById('edit-activo').checked = data.activo;
+  document.getElementById('modal-editar').classList.remove('hidden');
+}
+
+function filtrarCarreras(areaId, selectId) {
+  const select = document.getElementById(selectId);
+  const opciones = select.querySelectorAll('option[data-area]');
+  opciones.forEach(opt => {
+    opt.style.display = (!areaId || opt.dataset.area === String(areaId)) ? '' : 'none';
+  });
+  // Reset si la carrera actual no pertenece al área
+  const currentOpt = select.options[select.selectedIndex];
+  if (currentOpt && currentOpt.dataset.area && currentOpt.dataset.area !== String(areaId)) {
+    select.value = '';
+  }
+}
+
+function filtrarTabla() {
+  const q = document.getElementById('buscar').value.toLowerCase();
+  document.querySelectorAll('.fila-estudiante').forEach(row => {
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(q) ? '' : 'none';
+  });
+}
+
+function iniciarImportacion() {
+  const btn = document.getElementById('btn-importar');
+  const loading = document.getElementById('importar-loading');
+  // Esperar un tick para que el submit ocurra antes de deshabilitar
+  setTimeout(function() {
+    btn.disabled = true;
+    btn.textContent = 'Importando...';
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+    loading.classList.remove('hidden');
+  }, 50);
+}
+</script>

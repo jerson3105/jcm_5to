@@ -1,0 +1,151 @@
+<!-- Cambiar Área y Carrera -->
+<div class="hidden lg:block mb-8">
+  <h1 class="text-2xl font-bold text-slate-800">Cambiar Área y Carrera</h1>
+  <p class="text-slate-500 mt-1">Actualiza tu área y carrera de preferencia</p>
+</div>
+
+<div class="max-w-2xl mx-auto">
+  <!-- Selección actual -->
+  <div class="card-static mb-6 border-l-4 border-primary-500 bg-primary-50/30">
+    <h3 class="text-sm font-semibold text-slate-700 mb-3">Tu selección actual</h3>
+    <div class="flex flex-wrap gap-4">
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-500">Área:</span>
+        <% if (estudiante.area) { %>
+        <span class="badge-blue"><%= estudiante.area.nombre %></span>
+        <% } else { %>
+        <span class="badge-gray">Sin área</span>
+        <% } %>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-500">Carrera:</span>
+        <% if (estudiante.carrera) { %>
+        <span class="badge-green"><%= estudiante.carrera.nombre %></span>
+        <% } else { %>
+        <span class="badge-gray">Sin carrera</span>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nota importante -->
+  <div class="mb-6 p-4 bg-gold-50 border border-gold-200 rounded-xl">
+    <div class="flex gap-3">
+      <div class="shrink-0 mt-0.5">
+        <svg class="w-5 h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div>
+        <p class="text-sm font-semibold text-gold-800 mb-1">IMPORTANTE</p>
+        <p class="text-xs text-gold-700 leading-relaxed">En caso de no encontrar la especialidad de su preferencia, elija el área a fin de su especialidad. <span class="font-semibold">Ejemplo:</span> Ingeniería Industrial → elijo el <span class="font-bold">ÁREA C</span>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="card-static">
+    <form action="/estudiante/cambiar-carrera" method="POST" class="space-y-5">
+      <!-- Selector de área -->
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Área <span class="text-red-500">*</span></label>
+        <div class="grid grid-cols-1 gap-2" id="areas-grid">
+          <% areas.forEach(function(area) { %>
+          <label class="area-option relative flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all hover:border-primary-300 hover:bg-primary-50/50 <%= estudiante.area_id === area.id ? 'border-primary-500 bg-primary-50' : 'border-slate-200' %>">
+            <input type="radio" name="area_id" value="<%= area.id %>" class="sr-only peer" onchange="seleccionarArea(<%= area.id %>)" required <%= estudiante.area_id === area.id ? 'checked' : '' %>>
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 transition-colors <%= estudiante.area_id === area.id ? 'bg-primary-600 text-white' : 'bg-primary-100 text-primary-700' %>" id="area-icon-<%= area.id %>">
+              <%= area.nombre.charAt(area.nombre.length - 1) %>
+            </div>
+            <div class="flex-1">
+              <p class="text-sm font-semibold text-slate-800"><%= area.nombre %></p>
+              <p class="text-[11px] text-slate-400"><%= area.carreras ? area.carreras.length : 0 %> carrera(s) disponible(s)</p>
+            </div>
+            <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors <%= estudiante.area_id === area.id ? 'border-primary-600 bg-primary-600' : 'border-slate-300' %>" id="area-check-<%= area.id %>">
+              <svg class="w-3 h-3 text-white <%= estudiante.area_id === area.id ? '' : 'hidden' %>" fill="currentColor" viewBox="0 0 16 16" id="area-check-icon-<%= area.id %>"><path d="M13.854 3.646a.5.5 0 010 .708l-7 7a.5.5 0 01-.708 0l-3.5-3.5a.5.5 0 11.708-.708L6.5 10.293l6.646-6.647a.5.5 0 01.708 0z"/></svg>
+            </div>
+          </label>
+          <% }); %>
+        </div>
+      </div>
+
+      <!-- Selector de carrera -->
+      <div id="carrera-container" class="<%= estudiante.area_id ? '' : 'hidden' %>">
+        <label class="block text-sm font-semibold text-slate-700 mb-2">Carrera referencial <span class="text-xs font-normal text-slate-400">(opcional)</span></label>
+        <select name="carrera_id" id="carrera-select" class="w-full px-4 py-2.5 rounded-xl border-2 border-slate-200 text-sm text-slate-700 focus:border-primary-500 focus:ring-2 focus:ring-primary-100 transition-colors outline-none">
+          <option value="">Seleccionar carrera...</option>
+        </select>
+        <p class="text-[11px] text-slate-400 mt-1.5">Si no encuentras tu carrera, solo selecciona el área.</p>
+      </div>
+
+      <!-- Botón -->
+      <button type="submit" class="btn-primary w-full py-3 flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        Actualizar selección
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const carrerasPorArea = {};
+  const carreraActualId = <%= estudiante.carrera_id || 'null' %>;
+  <% areas.forEach(function(area) { %>
+  carrerasPorArea[<%= area.id %>] = [
+    <% if (area.carreras) { area.carreras.forEach(function(c) { %>
+    { id: <%= c.id %>, nombre: <%- JSON.stringify(c.nombre) %> },
+    <% }); } %>
+  ];
+  <% }); %>
+
+  function seleccionarArea(areaId) {
+    // Estilos de selección
+    document.querySelectorAll('.area-option').forEach(function(el) {
+      var radio = el.querySelector('input[type="radio"]');
+      var optAreaId = radio.value;
+      var icon = document.getElementById('area-icon-' + optAreaId);
+      var check = document.getElementById('area-check-' + optAreaId);
+      var checkIcon = document.getElementById('area-check-icon-' + optAreaId);
+
+      if (radio.checked) {
+        el.classList.remove('border-slate-200');
+        el.classList.add('border-primary-500', 'bg-primary-50');
+        icon.classList.remove('bg-primary-100', 'text-primary-700');
+        icon.classList.add('bg-primary-600', 'text-white');
+        check.classList.remove('border-slate-300');
+        check.classList.add('border-primary-600', 'bg-primary-600');
+        checkIcon.classList.remove('hidden');
+      } else {
+        el.classList.add('border-slate-200');
+        el.classList.remove('border-primary-500', 'bg-primary-50');
+        icon.classList.add('bg-primary-100', 'text-primary-700');
+        icon.classList.remove('bg-primary-600', 'text-white');
+        check.classList.add('border-slate-300');
+        check.classList.remove('border-primary-600', 'bg-primary-600');
+        checkIcon.classList.add('hidden');
+      }
+    });
+
+    // Mostrar carreras del área
+    var container = document.getElementById('carrera-container');
+    var select = document.getElementById('carrera-select');
+    var carreras = carrerasPorArea[areaId] || [];
+
+    select.innerHTML = '<option value="">Seleccionar carrera...</option>';
+    carreras.forEach(function(c) {
+      var opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.nombre;
+      if (c.id === carreraActualId) opt.selected = true;
+      select.appendChild(opt);
+    });
+
+    if (carreras.length > 0) {
+      container.classList.remove('hidden');
+    } else {
+      container.classList.add('hidden');
+    }
+  }
+
+  // Inicializar carreras si ya tiene área
+  <% if (estudiante.area_id) { %>
+  seleccionarArea(<%= estudiante.area_id %>);
+  <% } %>
+</script>
