@@ -12,7 +12,8 @@ const CLAVES_CONFIG = [
   { clave: 'alerta_nota_baja', defecto: '8', descripcion: 'Nota debajo de la cual se genera alerta pedagógica', tipo: 'number' },
   { clave: 'alerta_tendencia_baja', defecto: '3', descripcion: 'Cantidad de exámenes consecutivos con tendencia negativa para alerta', tipo: 'number' },
   { clave: 'mostrar_ranking_estudiantes', defecto: 'true', descripcion: 'Permitir que los estudiantes vean el ranking general', tipo: 'boolean' },
-  { clave: 'mostrar_ranking_padres', defecto: 'true', descripcion: 'Permitir que los padres vean el ranking', tipo: 'boolean' }
+  { clave: 'mostrar_ranking_padres', defecto: 'true', descripcion: 'Permitir que los padres vean el ranking', tipo: 'boolean' },
+  { clave: 'permitir_cambio_carrera', defecto: 'false', descripcion: 'Permitir que los estudiantes cambien su área/carrera', tipo: 'boolean' }
 ];
 
 const configuracionController = {
@@ -37,7 +38,7 @@ const configuracionController = {
           general: configuraciones.filter(c => ['nombre_institucion', 'anio_academico', 'grado'].includes(c.clave)),
           calificacion: configuraciones.filter(c => ['nota_aprobatoria', 'penalizacion_incorrecta', 'puntaje_blanco', 'puntaje_correcta'].includes(c.clave)),
           alertas: configuraciones.filter(c => ['alerta_nota_baja', 'alerta_tendencia_baja'].includes(c.clave)),
-          visibilidad: configuraciones.filter(c => ['mostrar_ranking_estudiantes', 'mostrar_ranking_padres'].includes(c.clave))
+          visibilidad: configuraciones.filter(c => ['mostrar_ranking_estudiantes', 'mostrar_ranking_padres', 'permitir_cambio_carrera'].includes(c.clave))
         }
       });
     } catch (error) {

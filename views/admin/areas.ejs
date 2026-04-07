@@ -57,6 +57,7 @@
         <div>
           <label for="carrera-puntaje" class="input-label">Puntaje mínimo de admisión</label>
           <input type="number" id="carrera-puntaje" name="puntaje_minimo_admision" class="input-field" step="0.0001" min="0" max="20" placeholder="Ej: 12.5000" value="0">
+          <p class="text-[11px] text-slate-400 mt-1">Usar formato de <strong>Nota Vigesimal</strong> (0 – 20, con hasta 4 decimales).</p>
         </div>
         <button type="submit" class="btn-primary w-full">
           <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
@@ -149,7 +150,7 @@
                   </div>
                 </td>
                 <td class="table-cell text-center carrera-view" data-cid="<%= carrera.id %>">
-                  <span class="text-sm font-mono font-semibold text-slate-600"><%= parseFloat(carrera.puntaje_minimo_admision).toFixed(2) %></span>
+                  <span class="text-sm font-mono font-semibold text-slate-600"><%= parseFloat(carrera.puntaje_minimo_admision).toFixed(4) %></span>
                 </td>
                 <td class="table-cell text-right carrera-view" data-cid="<%= carrera.id %>">
                   <div class="flex items-center justify-end gap-1">
@@ -166,7 +167,7 @@
                 <td class="table-cell carrera-edit hidden" data-cid="<%= carrera.id %>" colspan="3">
                   <form action="/admin/carreras/<%= carrera.id %>/update" method="POST" class="flex items-center gap-2">
                     <input type="text" name="nombre" value="<%= carrera.nombre %>" class="input-field flex-1" required>
-                    <input type="number" name="puntaje_minimo_admision" value="<%= carrera.puntaje_minimo_admision %>" class="input-field w-28" step="0.0001" min="0">
+                    <input type="number" name="puntaje_minimo_admision" value="<%= carrera.puntaje_minimo_admision %>" class="input-field w-28" step="0.0001" min="0" max="20" title="Nota Vigesimal (0-20)">
                     <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-primary-600 hover:bg-primary-700 transition-colors shrink-0" title="Guardar">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                     </button>

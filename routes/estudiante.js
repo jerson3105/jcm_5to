@@ -3,9 +3,21 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const role = require('../middleware/role');
 const estudianteController = require('../controllers/estudianteController');
+const { Configuracion } = require('../models');
 
 // Proteger todas las rutas de estudiante
 router.use(auth, role('estudiante'));
+
+// Cargar configuración para el layout
+router.use(async (req, res, next) => {
+  try {
+    const configCambio = await Configuracion.findOne({ where: { clave: 'permitir_cambio_carrera' } });
+    res.locals.permitirCambioCarrera = configCambio && configCambio.valor === 'true';
+  } catch (e) {
+    res.locals.permitirCambioCarrera = false;
+  }
+  next();
+});
 
 // Elegir carrera (primera vez) — antes del middleware de verificación
 router.get('/elegir-carrera', estudianteController.elegirCarrera);

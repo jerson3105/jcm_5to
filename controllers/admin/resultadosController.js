@@ -3,6 +3,7 @@ const calculoService = require('../../services/calculoService');
 const importService = require('../../services/importService');
 const { Op } = require('sequelize');
 const fs = require('fs');
+const XLSX = require('xlsx');
 
 const resultadosController = {
   // Página principal: seleccionar examen y ver sus resultados
@@ -42,6 +43,9 @@ const resultadosController = {
         order: [[{ model: Usuario, as: 'usuario' }, 'nombre', 'ASC']]
       });
 
+      // Secciones para plantilla de resultados
+      const secciones = await Seccion.findAll({ order: [['nombre', 'ASC']] });
+
       res.render('admin/resultados', {
         title: 'Resultados',
         layout: 'layouts/admin',
@@ -49,7 +53,8 @@ const resultadosController = {
         examenes,
         examenActual,
         resultados,
-        estudiantes
+        estudiantes,
+        secciones
       });
     } catch (error) {
       console.error('Error al cargar resultados:', error);
@@ -231,6 +236,63 @@ const resultadosController = {
     } catch (error) {
       console.error('Error al actualizar resultado:', error);
       req.session.error = 'Error al actualizar resultado.';
+      res.redirect('/admin/resultados');
+    }
+  },
+
+  // Descargar plantilla de resultados por sección
+  async plantilla(req, res) {
+    try {
+      const seccionId = req.query.seccion_id;
+      if (!seccionId) {
+        req.session.error = 'Debes seleccionar una sección.';
+        return res.redirect('/admin/resultados');
+      }
+
+      const seccion = await Seccion.findByPk(seccionId);
+      if (!seccion) {
+        req.session.error = 'Sección no encontrada.';
+        return res.redirect('/admin/resultados');
+      }
+
+      // Obtener estudiantes de esa sección ordenados por nombre
+      const estudiantes = await Estudiante.findAll({
+        where: { seccion_id: seccionId },
+        include: [{ association: 'usuario', attributes: ['nombre'] }],
+        order: [[{ model: Usuario, as: 'usuario' }, 'nombre', 'ASC']]
+      });
+
+      if (estudiantes.length === 0) {
+        req.session.error = `No hay estudiantes en la sección ${seccion.nombre}.`;
+        return res.redirect('/admin/resultados');
+      }
+
+      const wb = XLSX.utils.book_new();
+
+      // Encabezados + datos de estudiantes
+      const datos = [['dni', 'nombre', 'correctas', 'incorrectas', 'en_blanco']];
+      estudiantes.forEach(est => {
+        datos.push([est.dni, est.usuario.nombre, '', '', '']);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(datos);
+      ws['!cols'] = [
+        { wch: 15 },  // dni
+        { wch: 35 },  // nombre
+        { wch: 12 },  // correctas
+        { wch: 12 },  // incorrectas
+        { wch: 12 }   // en_blanco
+      ];
+      XLSX.utils.book_append_sheet(wb, ws, seccion.nombre);
+
+      const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+      const filename = `plantilla_resultados_${seccion.nombre.replace(/\s+/g, '_')}.xlsx`;
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.send(buffer);
+    } catch (error) {
+      console.error('Error al generar plantilla de resultados:', error);
+      req.session.error = 'Error al generar la plantilla.';
       res.redirect('/admin/resultados');
     }
   },

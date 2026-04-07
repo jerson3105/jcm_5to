@@ -46,22 +46,51 @@
 </div>
 
 <!-- Tabla comparativa -->
-<div class="card">
+<div class="card mb-6">
   <h3 class="text-sm font-semibold text-slate-700 mb-4">Detalle Comparativo</h3>
   <div class="overflow-x-auto">
     <table class="w-full" id="tablaDetalle">
       <thead>
         <tr class="border-b border-slate-200">
           <th class="table-header">Examen</th>
+          <th class="table-header text-center">Tipo</th>
           <th class="table-header text-right">Mi Nota</th>
           <th class="table-header text-right">Prom. General</th>
           <th class="table-header text-right">Prom. Sección</th>
           <th class="table-header text-right">Diferencia</th>
+          <th class="table-header text-right">Δ vs Anterior</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100" id="tbodyDetalle">
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Cards de Mejora / Retroceso -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6" id="cardsProgreso">
+</div>
+
+<!-- Gráficos adicionales -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+  <!-- Aptitud vs Conocimientos -->
+  <div class="card">
+    <h3 class="text-sm font-semibold text-slate-700 mb-4">Aptitud vs Conocimientos</h3>
+    <div class="relative" style="height: 300px;">
+      <canvas id="chartAptVsCon"></canvas>
+    </div>
+    <div class="flex items-center justify-center gap-6 mt-3 text-xs">
+      <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-500"></span> Aptitud</span>
+      <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Conocimientos</span>
+    </div>
+  </div>
+
+  <!-- Evolución del % de Aciertos -->
+  <div class="card">
+    <h3 class="text-sm font-semibold text-slate-700 mb-4">Evolución del % de Aciertos</h3>
+    <div class="relative" style="height: 300px;">
+      <canvas id="chartPctAciertos"></canvas>
+    </div>
   </div>
 </div>
 <% } %>
@@ -262,20 +291,196 @@
     }
   });
 
-  // === Tabla comparativa dinámica ===
+  // === Tabla comparativa dinámica con Δ vs Anterior ===
   const tbody = document.getElementById('tbodyDetalle');
   resultados.forEach((r, i) => {
     const diff = (r.nota - parseFloat(promediosGenerales[i])).toFixed(2);
     const diffClass = diff >= 0 ? 'text-green-600' : 'text-red-500';
     const diffSign = diff >= 0 ? '+' : '';
+    
+    // Delta vs examen anterior
+    let deltaHtml = '<span class="text-slate-400">—</span>';
+    if (i > 0) {
+      const delta = (r.nota - resultados[i - 1].nota).toFixed(2);
+      const deltaSign = delta >= 0 ? '+' : '';
+      const deltaClass = delta >= 0 ? 'text-green-600' : 'text-red-500';
+      const deltaIcon = delta >= 0 ? '↑' : '↓';
+      deltaHtml = `<span class="font-semibold ${deltaClass}">${deltaIcon} ${deltaSign}${delta}</span>`;
+    }
+    
+    const tipoLabel = r.tipo === 'aptitud' 
+      ? '<span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700">Aptitud</span>' 
+      : '<span class="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-100 text-emerald-700">Conoc.</span>';
+    
     tbody.innerHTML += `
       <tr class="hover:bg-slate-50">
         <td class="table-cell font-medium text-slate-800">${r.examen}<br><span class="text-xs text-slate-400">${r.fecha}</span></td>
+        <td class="table-cell text-center">${tipoLabel}</td>
         <td class="table-cell text-right font-bold ${r.nota >= 11 ? 'text-green-600' : 'text-red-500'}">${r.nota.toFixed(2)}</td>
         <td class="table-cell text-right text-slate-600">${parseFloat(promediosGenerales[i]).toFixed(2)}</td>
         <td class="table-cell text-right text-slate-600">${parseFloat(promediosSeccion[i]).toFixed(2)}</td>
         <td class="table-cell text-right font-semibold ${diffClass}">${diffSign}${diff}</td>
+        <td class="table-cell text-right">${deltaHtml}</td>
       </tr>`;
+  });
+
+  // === Cards de Mejora / Retroceso ===
+  const cardsDiv = document.getElementById('cardsProgreso');
+  
+  function buildProgressCard(label, emoji, data) {
+    if (data.length < 2) {
+      return `
+        <div class="bg-white rounded-xl border border-slate-200 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-lg">${emoji}</span>
+            <h4 class="text-sm font-semibold text-slate-700">${label}</h4>
+          </div>
+          <p class="text-xs text-slate-400">Necesitas al menos 2 exámenes</p>
+        </div>`;
+    }
+    const last = data[data.length - 1].nota;
+    const prev = data[data.length - 2].nota;
+    const delta = (last - prev).toFixed(2);
+    const pct = prev !== 0 ? ((last - prev) / prev * 100).toFixed(1) : '0.0';
+    const isUp = delta >= 0;
+    const borderColor = isUp ? 'border-green-200' : 'border-red-200';
+    const bgColor = isUp ? 'bg-green-50' : 'bg-red-50';
+    const textColor = isUp ? 'text-green-600' : 'text-red-500';
+    const arrow = isUp ? '↑' : '↓';
+    const sign = delta >= 0 ? '+' : '';
+    return `
+      <div class="bg-white rounded-xl border ${borderColor} p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="text-lg">${emoji}</span>
+          <h4 class="text-sm font-semibold text-slate-700">${label}</h4>
+        </div>
+        <div class="flex items-end gap-3 mb-2">
+          <span class="text-3xl font-extrabold ${textColor}">${arrow} ${sign}${delta}</span>
+          <span class="text-sm font-medium ${textColor} mb-1">(${sign}${pct}%)</span>
+        </div>
+        <div class="flex items-center gap-2 text-xs text-slate-500">
+          <span class="px-2 py-0.5 rounded ${bgColor} font-medium">${prev.toFixed(2)} → ${last.toFixed(2)}</span>
+        </div>
+      </div>`;
+  }
+
+  const aptitudData = resultados.filter(r => r.tipo === 'aptitud');
+  const conocimientosData = resultados.filter(r => r.tipo === 'conocimientos');
+  
+  cardsDiv.innerHTML = 
+    buildProgressCard('General', '📊', resultados) +
+    buildProgressCard('Aptitud', '📘', aptitudData) +
+    buildProgressCard('Conocimientos', '📗', conocimientosData);
+
+  // === Gráfico Aptitud vs Conocimientos ===
+  const aptLabels = aptitudData.map(r => r.examen);
+  const aptNotas = aptitudData.map(r => r.nota);
+  const conLabels = conocimientosData.map(r => r.examen);
+  const conNotas = conocimientosData.map(r => r.nota);
+  
+  // Combinar labels en orden cronológico
+  const allLabelsApt = aptitudData.map((r, i) => ({ label: r.examen, fecha: r.fecha, nota: r.nota, tipo: 'apt', idx: i }));
+  const allLabelsCon = conocimientosData.map((r, i) => ({ label: r.examen, fecha: r.fecha, nota: r.nota, tipo: 'con', idx: i }));
+
+  new Chart(document.getElementById('chartAptVsCon'), {
+    type: 'line',
+    data: {
+      datasets: [
+        {
+          label: 'Aptitud',
+          data: aptitudData.map(r => ({ x: r.examen, y: r.nota })),
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointBackgroundColor: '#3b82f6',
+          tension: 0.3,
+          fill: true
+        },
+        {
+          label: 'Conocimientos',
+          data: conocimientosData.map(r => ({ x: r.examen, y: r.nota })),
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16, 185, 129, 0.1)',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointBackgroundColor: '#10b981',
+          tension: 0.3,
+          fill: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { intersect: false, mode: 'nearest' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e293b',
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(ctx) {
+              return ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(2);
+            }
+          }
+        }
+      },
+      scales: {
+        y: { min: 0, max: 20, grid: { color: '#f1f5f9' }, ticks: { stepSize: 2 } },
+        x: { 
+          type: 'category',
+          labels: [...new Set([...aptitudData.map(r => r.examen), ...conocimientosData.map(r => r.examen)])],
+          grid: { display: false }, 
+          ticks: { font: { size: 9 }, maxRotation: 45 } 
+        }
+      }
+    }
+  });
+
+  // === Gráfico de Evolución del % de Aciertos ===
+  const pctAciertos = resultados.map(r => (r.correctas / r.total_preguntas * 100).toFixed(1));
+  
+  new Chart(document.getElementById('chartPctAciertos'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: '% Aciertos',
+        data: pctAciertos,
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: pctAciertos.map(p => parseFloat(p) >= 60 ? '#22c55e' : parseFloat(p) >= 40 ? '#eab308' : '#ef4444'),
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e293b',
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            label: function(ctx) {
+              return 'Aciertos: ' + ctx.parsed.y + '%';
+            }
+          }
+        }
+      },
+      scales: {
+        y: { min: 0, max: 100, grid: { color: '#f1f5f9' }, ticks: { callback: v => v + '%', stepSize: 20 } },
+        x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 45 } }
+      }
+    }
   });
 })();
 </script>

@@ -1,4 +1,4 @@
-const { Estudiante, Usuario, Resultado, Examen, Seccion, Area, Carrera, sequelize } = require('../models');
+const { Estudiante, Usuario, Resultado, Examen, Seccion, Area, Carrera, Configuracion, sequelize } = require('../models');
 const { Op, fn, col, literal } = require('sequelize');
 
 const estudianteController = {
@@ -106,12 +106,14 @@ const estudianteController = {
         order: [[{ model: Examen, as: 'examen' }, 'fecha', 'DESC']]
       });
 
-      // Rankings por examen: para cada resultado, calcular su posición
+      // Rankings por examen y promedios de porcentajes por examen
       const rankingsPorExamen = {};
+      const promediosPorExamen = {};
       for (const resultado of resultados) {
         const todosResultados = await Resultado.findAll({
           where: { examen_id: resultado.examen_id },
-          attributes: ['estudiante_id', 'nota_vigesimal'],
+          attributes: ['estudiante_id', 'nota_vigesimal', 'correctas', 'incorrectas', 'en_blanco'],
+          include: [{ association: 'examen', attributes: ['total_preguntas'] }],
           order: [['nota_vigesimal', 'DESC']],
           raw: true
         });
@@ -120,6 +122,18 @@ const estudianteController = {
           posicion: posicion + 1,
           total: todosResultados.length
         };
+
+        // Promedios de porcentaje para comparación
+        const totalPreg = resultado.examen.total_preguntas || 1;
+        const sumPctCorr = todosResultados.reduce((s, r) => s + (r.correctas / totalPreg * 100), 0);
+        const sumPctIncorr = todosResultados.reduce((s, r) => s + (r.incorrectas / totalPreg * 100), 0);
+        const sumPctBlanco = todosResultados.reduce((s, r) => s + (r.en_blanco / totalPreg * 100), 0);
+        const n = todosResultados.length || 1;
+        promediosPorExamen[resultado.examen_id] = {
+          pctCorrectasAvg: (sumPctCorr / n).toFixed(1),
+          pctIncorrectasAvg: (sumPctIncorr / n).toFixed(1),
+          pctBlancoAvg: (sumPctBlanco / n).toFixed(1)
+        };
       }
 
       res.render('estudiante/examenes', {
@@ -127,7 +141,8 @@ const estudianteController = {
         layout: 'layouts/estudiante',
         currentPage: 'examenes',
         resultados,
-        rankingsPorExamen
+        rankingsPorExamen,
+        promediosPorExamen: JSON.stringify(promediosPorExamen)
       });
     } catch (error) {
       console.error('Error al listar exámenes del estudiante:', error);
@@ -193,10 +208,12 @@ const estudianteController = {
         resultados: JSON.stringify(resultados.map(r => ({
           examen: r.examen.descripcion || `${r.examen.tipo} - ${r.examen.fecha}`,
           fecha: r.examen.fecha,
+          tipo: r.examen.tipo,
           nota: parseFloat(r.nota_vigesimal),
           correctas: r.correctas,
           incorrectas: r.incorrectas,
           en_blanco: r.en_blanco,
+          total_preguntas: r.examen.total_preguntas || 1,
           puntaje_bruto: parseFloat(r.puntaje_bruto)
         }))),
         promediosGenerales: JSON.stringify(promediosGenerales),
@@ -460,6 +477,13 @@ const estudianteController = {
         promedioGeneral = suma / resultados.length;
       }
 
+      // Nota vigesimal promedio
+      let notaPromedioFinal = 0;
+      if (resultados.length > 0) {
+        const sumaNotas = resultados.reduce((acc, r) => acc + parseFloat(r.nota_vigesimal), 0);
+        notaPromedioFinal = sumaNotas / resultados.length;
+      }
+
       // Puntaje bruto promedio
       let puntajePromedioFinal = 0;
       if (resultados.length > 0) {
@@ -479,7 +503,7 @@ const estudianteController = {
       // Simulación: comparar con todas las carreras del área
       const simulaciones = carrerasArea.map(c => {
         const puntajeMinimo = parseFloat(c.puntaje_minimo_admision) || 0;
-        const diferencia = puntajePromedioFinal - puntajeMinimo;
+        const diferencia = notaPromedioFinal - puntajeMinimo;
         let estado = 'aprobado';
         if (puntajeMinimo === 0) {
           estado = 'sin_datos';
@@ -492,7 +516,7 @@ const estudianteController = {
           id: c.id,
           nombre: c.nombre,
           puntaje_minimo: puntajeMinimo,
-          mi_puntaje: puntajePromedioFinal,
+          mi_puntaje: notaPromedioFinal,
           diferencia,
           estado,
           es_mi_carrera: estudiante.carrera_id === c.id
@@ -643,6 +667,15 @@ const estudianteController = {
   // Cambiar Área y Carrera (GET)
   async cambiarCarrera(req, res) {
     try {
+      // Verificar si está permitido cambiar carrera
+      const configCambio = await Configuracion.findOne({ where: { clave: 'permitir_cambio_carrera' } });
+      const permitido = configCambio && configCambio.valor === 'true';
+
+      if (!permitido) {
+        req.session.error = 'El cambio de área/carrera no está habilitado en este momento. Consulta con el administrador.';
+        return res.redirect('/estudiante');
+      }
+
       const estudiante = await Estudiante.findOne({
         where: { usuario_id: req.session.user.id },
         include: [
@@ -678,6 +711,15 @@ const estudianteController = {
   // Guardar cambio de Área y Carrera (POST)
   async guardarCambioCarrera(req, res) {
     try {
+      // Verificar si está permitido cambiar carrera
+      const configCambio = await Configuracion.findOne({ where: { clave: 'permitir_cambio_carrera' } });
+      const permitido = configCambio && configCambio.valor === 'true';
+
+      if (!permitido) {
+        req.session.error = 'El cambio de área/carrera no está habilitado en este momento.';
+        return res.redirect('/estudiante');
+      }
+
       const { area_id, carrera_id } = req.body;
 
       if (!area_id) {

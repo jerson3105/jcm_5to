@@ -7,12 +7,14 @@ const rankingsController = {
       const examenId = req.query.examen_id || null;
       const seccionId = req.query.seccion_id || null;
       const areaId = req.query.area_id || null;
+      const carreraId = req.query.carrera_id || null;
 
       // Cargar filtros
-      const [examenes, secciones, areas] = await Promise.all([
+      const [examenes, secciones, areas, carreras] = await Promise.all([
         Examen.findAll({ order: [['fecha', 'DESC']] }),
         Seccion.findAll({ order: [['nombre', 'ASC']] }),
-        Area.findAll({ order: [['nombre', 'ASC']] })
+        Area.findAll({ order: [['nombre', 'ASC']] }),
+        Carrera.findAll({ include: [{ association: 'area', attributes: ['nombre'] }], order: [['nombre', 'ASC']] })
       ]);
 
       let rankingData = [];
@@ -46,6 +48,7 @@ const rankingsController = {
           .filter(r => {
             if (seccionId && r.estudiante.seccion_id !== parseInt(seccionId)) return false;
             if (areaId && r.estudiante.area_id !== parseInt(areaId)) return false;
+            if (carreraId && r.estudiante.carrera_id !== parseInt(carreraId)) return false;
             return true;
           })
           .map((r, idx) => {
@@ -73,6 +76,7 @@ const rankingsController = {
         const whereEstudiante = {};
         if (seccionId) whereEstudiante.seccion_id = seccionId;
         if (areaId) whereEstudiante.area_id = areaId;
+        if (carreraId) whereEstudiante.carrera_id = carreraId;
 
         const promedios = await Resultado.findAll({
           attributes: [
@@ -81,7 +85,8 @@ const rankingsController = {
             [fn('AVG', col('puntaje_bruto')), 'puntaje_promedio'],
             [fn('COUNT', col('Resultado.id')), 'total_examenes'],
             [fn('SUM', col('correctas')), 'total_correctas'],
-            [fn('SUM', col('incorrectas')), 'total_incorrectas']
+            [fn('SUM', col('incorrectas')), 'total_incorrectas'],
+            [fn('SUM', col('en_blanco')), 'total_en_blanco']
           ],
           include: [{
             association: 'estudiante',
@@ -125,6 +130,7 @@ const rankingsController = {
             total_examenes: parseInt(p.total_examenes),
             total_correctas: parseInt(p.total_correctas),
             total_incorrectas: parseInt(p.total_incorrectas),
+            total_en_blanco: parseInt(p.total_en_blanco),
             puntaje_promedio: parseFloat(p.puntaje_promedio),
             nota_vigesimal: prom
           };
@@ -147,7 +153,8 @@ const rankingsController = {
         examenes,
         secciones,
         areas,
-        filtros: { examen_id: examenId, seccion_id: seccionId, area_id: areaId },
+        carreras,
+        filtros: { examen_id: examenId, seccion_id: seccionId, area_id: areaId, carrera_id: carreraId },
         tipoRanking,
         stats: { totalEstudiantes, promedioGlobal, mejorNota, aprobados }
       });

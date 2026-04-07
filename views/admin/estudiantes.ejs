@@ -1,11 +1,15 @@
 <!-- Estudiantes CRUD -->
-<div class="hidden lg:block mb-8">
+<div class="hidden lg:block mb-8 print:hidden">
   <div class="flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Estudiantes</h1>
       <p class="text-slate-500 mt-1">Gestiona los estudiantes del 5to año</p>
     </div>
     <div class="flex items-center gap-2">
+      <button onclick="document.getElementById('modal-exportar').classList.remove('hidden')" class="btn-secondary">
+        <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        Exportar PDF
+      </button>
       <button onclick="document.getElementById('modal-importar').classList.remove('hidden')" class="btn-secondary">
         <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
         Carga Masiva
@@ -19,7 +23,11 @@
 </div>
 
 <!-- Botones mobile -->
-<div class="lg:hidden mb-4 flex gap-2">
+<div class="lg:hidden mb-4 flex gap-2 print:hidden">
+  <button onclick="document.getElementById('modal-exportar').classList.remove('hidden')" class="btn-secondary flex-1 text-sm">
+    <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+    PDF
+  </button>
   <button onclick="document.getElementById('modal-importar').classList.remove('hidden')" class="btn-secondary flex-1 text-sm">
     <svg class="w-4 h-4 inline -mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
     Carga Masiva
@@ -46,7 +54,16 @@
 <% } %>
 
 <!-- Tabla de estudiantes -->
-<div class="card-static">
+<div class="card-static" id="tabla-printable">
+  <!-- Cabecera impresión -->
+  <div class="hidden print:block mb-6">
+    <div class="text-center border-b-2 border-slate-800 pb-4">
+      <h1 class="text-xl font-bold">I.E. José Carlos Mariátegui — Ica</h1>
+      <h2 class="text-lg font-semibold mt-1">Lista de Estudiantes — 5to Año</h2>
+      <p class="text-sm text-slate-600 mt-1" id="print-filtros"></p>
+      <p class="text-xs text-slate-500 mt-1">Generado: <%= new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
+    </div>
+  </div>
   <% if (estudiantes.length === 0) { %>
   <div class="text-center py-12">
     <div class="icon-box bg-emerald-100 text-emerald-400 mx-auto mb-3 w-14 h-14 rounded-2xl">
@@ -56,7 +73,7 @@
     <p class="text-xs text-slate-400 mt-1">Agrega uno manualmente o usa la carga masiva</p>
   </div>
   <% } else { %>
-  <div class="flex items-center justify-between mb-5">
+  <div class="flex items-center justify-between mb-5 print:hidden">
     <div class="flex items-center gap-2">
       <div class="icon-box bg-emerald-100 text-emerald-600">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
@@ -66,7 +83,7 @@
         <p class="text-xs text-slate-400"><%= estudiantes.length %> registrado(s)</p>
       </div>
     </div>
-    <div class="relative">
+    <div class="relative print:hidden">
       <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
       <input type="text" id="buscar" class="input-field pl-9 w-64" placeholder="Buscar por nombre o DNI..." oninput="filtrarTabla()">
     </div>
@@ -79,12 +96,12 @@
           <th class="table-header">DNI</th>
           <th class="table-header">Sección</th>
           <th class="table-header">Carrera</th>
-          <th class="table-header text-right">Acciones</th>
+          <th class="table-header text-right print:hidden">Acciones</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-slate-100">
         <% estudiantes.forEach(est => { %>
-        <tr class="hover:bg-slate-50/80 transition-colors fila-estudiante">
+        <tr class="hover:bg-slate-50/80 transition-colors fila-estudiante" data-area="<%= est.area_id || '' %>" data-carrera="<%= est.carrera_id || '' %>">
           <td class="table-cell">
             <div class="flex items-center gap-3">
               <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold shrink-0">
@@ -102,7 +119,7 @@
           <td class="table-cell">
             <span class="text-sm <%= est.carrera ? 'text-slate-600' : 'text-slate-300' %>"><%= est.carrera ? est.carrera.nombre : '—' %></span>
           </td>
-          <td class="table-cell text-right">
+          <td class="table-cell text-right print:hidden">
             <div class="flex items-center justify-end gap-1">
               <button onclick='abrirEditar(<%- JSON.stringify({id: est.id, nombre: est.usuario.nombre, email: est.usuario.email, dni: est.dni, seccion_id: est.seccion_id, area_id: est.area_id, carrera_id: est.carrera_id, activo: est.usuario.activo}) %>)' class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-primary-600 hover:bg-primary-50 transition-colors" title="Editar">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
@@ -124,7 +141,58 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Pie de impresión -->
+  <div class="hidden print:block mt-8 pt-4 border-t border-slate-300">
+    <div class="flex justify-between text-xs text-slate-500">
+      <span id="print-count"><%= estudiantes.length %> estudiante(s)</span>
+      <span>I.E. José Carlos Mariátegui — Ica</span>
+    </div>
+    <div class="flex justify-between text-xs text-slate-400 mt-4">
+      <div class="border-t border-slate-400 pt-1 w-48 text-center">Firma del Director(a)</div>
+      <div class="border-t border-slate-400 pt-1 w-48 text-center">Firma del Coordinador(a)</div>
+    </div>
+  </div>
+
   <% } %>
+</div>
+
+<!-- Modal Exportar PDF -->
+<div id="modal-exportar" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 print:hidden">
+  <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('modal-exportar').classList.add('hidden')"></div>
+  <div class="relative bg-white rounded-xl shadow-lg max-w-md w-full p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-semibold text-slate-800">Exportar PDF</h2>
+      <button onclick="document.getElementById('modal-exportar').classList.add('hidden')" class="text-slate-400 hover:text-slate-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="text-sm text-slate-500 mb-4">Selecciona los filtros para el listado. Déjalos vacíos para exportar todos.</p>
+    <div class="space-y-4">
+      <div>
+        <label class="input-label">Área</label>
+        <select id="export-area" class="input-field" onchange="filtrarCarrerasExport()">
+          <option value="">Todas las áreas</option>
+          <% areas.forEach(a => { %>
+          <option value="<%= a.id %>"><%= a.nombre %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div>
+        <label class="input-label">Carrera</label>
+        <select id="export-carrera" class="input-field">
+          <option value="">Todas las carreras</option>
+          <% carreras.forEach(c => { %>
+          <option value="<%= c.id %>" data-area="<%= c.area_id %>"><%= c.nombre %></option>
+          <% }) %>
+        </select>
+      </div>
+      <button onclick="exportarPDF()" class="btn-primary w-full">
+        <svg class="w-4 h-4 inline -mt-0.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+        Generar PDF
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Modal Crear Estudiante -->
@@ -375,7 +443,6 @@ function filtrarTabla() {
 function iniciarImportacion() {
   const btn = document.getElementById('btn-importar');
   const loading = document.getElementById('importar-loading');
-  // Esperar un tick para que el submit ocurra antes de deshabilitar
   setTimeout(function() {
     btn.disabled = true;
     btn.textContent = 'Importando...';
@@ -383,4 +450,72 @@ function iniciarImportacion() {
     loading.classList.remove('hidden');
   }, 50);
 }
+
+function exportarPDF() {
+  const areaSelect = document.getElementById('export-area');
+  const carreraSelect = document.getElementById('export-carrera');
+  const areaId = areaSelect.value;
+  const carreraId = carreraSelect.value;
+  const areaTexto = areaSelect.options[areaSelect.selectedIndex].text;
+  const carreraTexto = carreraSelect.options[carreraSelect.selectedIndex].text;
+
+  // Construir texto de filtros para la cabecera de impresion
+  var filtrosTexto = 'Todos los estudiantes';
+  var partes = [];
+  if (areaId) { partes.push('Área: ' + areaTexto); }
+  if (carreraId) { partes.push('Carrera: ' + carreraTexto); }
+  if (partes.length > 0) { filtrosTexto = partes.join(' | '); }
+  document.getElementById('print-filtros').textContent = filtrosTexto;
+
+  // Filtrar filas de la tabla
+  var filas = document.querySelectorAll('.fila-estudiante');
+  var count = 0;
+  filas.forEach(function(fila) {
+    var fAreaId = fila.getAttribute('data-area');
+    var fCarreraId = fila.getAttribute('data-carrera');
+    var mostrar = true;
+    if (areaId && fAreaId !== areaId) { mostrar = false; }
+    if (carreraId && fCarreraId !== carreraId) { mostrar = false; }
+    if (mostrar) {
+      fila.classList.remove('print-hidden');
+      count++;
+    } else {
+      fila.classList.add('print-hidden');
+    }
+  });
+
+  document.getElementById('print-count').textContent = count + ' estudiante(s)';
+
+  // Cerrar modal e imprimir
+  document.getElementById('modal-exportar').classList.add('hidden');
+  setTimeout(function() { window.print(); }, 200);
+}
+
+function filtrarCarrerasExport() {
+  var areaId = document.getElementById('export-area').value;
+  var carreraSelect = document.getElementById('export-carrera');
+  var opciones = carreraSelect.querySelectorAll('option[data-area]');
+  carreraSelect.value = '';
+  opciones.forEach(function(opt) {
+    if (!areaId || opt.getAttribute('data-area') === areaId) {
+      opt.style.display = '';
+    } else {
+      opt.style.display = 'none';
+    }
+  });
+}
 </script>
+
+<style>
+@media print {
+  .sidebar-scroll, nav, header, .lg\\:ml-64 { margin-left: 0 !important; }
+  body { zoom: 0.7; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { size: A4 portrait; margin: 10mm; }
+  .card-static { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+  .badge-blue { border: 1px solid #cbd5e1; background: #f8fafc !important; color: #334155 !important; }
+  .print\:hidden, .print-hidden { display: none !important; }
+  table { font-size: 11px; }
+  .table-header { padding: 6px 8px !important; }
+  .table-cell { padding: 5px 8px !important; }
+}
+</style>

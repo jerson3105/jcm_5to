@@ -16,7 +16,7 @@
 
 <!-- Filtros -->
 <div class="card-static mb-6 print:hidden">
-  <form method="GET" action="/admin/rankings" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+  <form method="GET" action="/admin/rankings" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
     <div>
       <label class="input-label">Examen</label>
       <select name="examen_id" class="input-field text-sm" onchange="this.form.submit()">
@@ -43,6 +43,15 @@
         <option value="">Todas</option>
         <% areas.forEach(function(a) { %>
         <option value="<%= a.id %>" <%= filtros.area_id == a.id ? 'selected' : '' %>><%= a.nombre %></option>
+        <% }); %>
+      </select>
+    </div>
+    <div>
+      <label class="input-label">Carrera</label>
+      <select name="carrera_id" class="input-field text-sm" onchange="this.form.submit()">
+        <option value="">Todas</option>
+        <% carreras.forEach(function(c) { %>
+        <option value="<%= c.id %>" <%= filtros.carrera_id == c.id ? 'selected' : '' %>><%= c.nombre %></option>
         <% }); %>
       </select>
     </div>
@@ -158,6 +167,8 @@
           Promedio General de todos los exámenes
         <% } %>
         <% if (filtros.seccion_id) { %> | Sección: <%= secciones.find(s => s.id == filtros.seccion_id) ? secciones.find(s => s.id == filtros.seccion_id).nombre : '' %><% } %>
+        <% if (filtros.area_id) { %> | Área: <%= areas.find(a => a.id == filtros.area_id) ? areas.find(a => a.id == filtros.area_id).nombre : '' %><% } %>
+        <% if (filtros.carrera_id) { %> | Carrera: <%= carreras.find(c => c.id == filtros.carrera_id) ? carreras.find(c => c.id == filtros.carrera_id).nombre : '' %><% } %>
 
       </p>
       <p class="text-xs text-slate-500 mt-1">Generado: <%= new Date().toLocaleDateString('es-PE', { day: '2-digit', month: 'long', year: 'numeric' }) %></p>
@@ -189,6 +200,7 @@
           <th class="table-header text-center">P. Bruto</th>
           <% } else { %>
           <th class="table-header text-center">Exámenes</th>
+          <th class="table-header text-center">C / I / B Total</th>
           <% } %>
           <th class="table-header text-right"><%= tipoRanking === 'examen' ? 'Nota' : 'Promedio' %></th>
         </tr>
@@ -240,6 +252,13 @@
           </td>
           <% } else { %>
           <td class="table-cell text-center"><span class="badge-blue text-xs"><%= r.total_examenes %></span></td>
+          <td class="table-cell text-center">
+            <span class="text-emerald-600 font-medium text-sm"><%= r.total_correctas %></span>
+            <span class="text-slate-300 mx-0.5">/</span>
+            <span class="text-red-500 font-medium text-sm"><%= r.total_incorrectas %></span>
+            <span class="text-slate-300 mx-0.5">/</span>
+            <span class="text-slate-400 text-sm"><%= r.total_en_blanco %></span>
+          </td>
           <% } %>
           <td class="table-cell text-right">
             <div class="flex flex-col items-end gap-1">
@@ -288,7 +307,8 @@ function imprimirRanking() {
   /* Ocultar sidebar, header, nav */
   .sidebar-scroll, nav, header, .lg\\:ml-64 { margin-left: 0 !important; }
   body > *:not(.print-area) { }
-  @page { size: A4 portrait; margin: 15mm; }
+  body { zoom: 0.7; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { size: A4 portrait; margin: 10mm; }
   .card-static { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
   .badge-blue, .badge-green { border: 1px solid #cbd5e1; background: #f8fafc !important; color: #334155 !important; }
   table { font-size: 11px; }

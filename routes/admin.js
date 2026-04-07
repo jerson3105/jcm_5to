@@ -104,6 +104,7 @@ router.post('/examenes/:id/delete', examenesController.destroy);
 
 // === RESULTADOS ===
 router.get('/resultados', resultadosController.index);
+router.get('/resultados/plantilla', resultadosController.plantilla);
 router.post('/resultados', resultadosController.store);
 router.post('/resultados/importar', upload.single('archivo'), resultadosController.importar);
 router.post('/resultados/:id/update', resultadosController.update);
