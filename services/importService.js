@@ -4,9 +4,9 @@ const calculoService = require('./calculoService');
 const importService = {
   /**
    * Parsea un archivo Excel/CSV y retorna filas normalizadas.
-   * Espera columnas: dni, correctas, incorrectas, en_blanco
+   * Espera columnas: dni, correctas, incorrectas (en_blanco se calcula automáticamente)
    * @param {string} filePath - Ruta del archivo subido
-   * @returns {Array<{dni, correctas, incorrectas, en_blanco}>}
+   * @returns {Array<{dni, correctas, incorrectas}>}
    */
   parsearArchivo(filePath) {
     const workbook = XLSX.readFile(filePath);
@@ -32,7 +32,6 @@ const importService = {
       const dni = find(['dni', 'codigo', 'cod']);
       const correctas = find(['correctas', 'buenas', 'aciertos', 'correct']);
       const incorrectas = find(['incorrectas', 'malas', 'errores', 'incorrect']);
-      const en_blanco = find(['en_blanco', 'enblanco', 'blanco', 'sin_responder', 'vacias']);
 
       if (dni === undefined) {
         throw new Error(`Fila ${idx + 2}: No se encontró columna de DNI.`);
@@ -42,8 +41,7 @@ const importService = {
         fila: idx + 2,
         dni: String(dni).trim(),
         correctas: parseInt(correctas) || 0,
-        incorrectas: parseInt(incorrectas) || 0,
-        en_blanco: parseInt(en_blanco) || 0
+        incorrectas: parseInt(incorrectas) || 0
       };
     });
 
@@ -69,8 +67,18 @@ const importService = {
         continue;
       }
 
+      // Auto-calcular en_blanco
+      const correctas = parseInt(fila.correctas) || 0;
+      const incorrectas = parseInt(fila.incorrectas) || 0;
+      const en_blanco = totalPreguntas - correctas - incorrectas;
+
+      if (en_blanco < 0) {
+        errores.push({ fila: fila.fila, dni: fila.dni, error: `Correctas (${correctas}) + Incorrectas (${incorrectas}) supera el total (${totalPreguntas})` });
+        continue;
+      }
+
       // Validar respuestas
-      const validacion = calculoService.validarFila(fila.correctas, fila.incorrectas, fila.en_blanco, totalPreguntas);
+      const validacion = calculoService.validarFila(correctas, incorrectas, en_blanco, totalPreguntas);
       if (!validacion.ok) {
         errores.push({ fila: fila.fila, dni: fila.dni, error: validacion.error });
         continue;
@@ -78,14 +86,14 @@ const importService = {
 
       // Calcular puntajes
       const { puntaje_bruto, nota_vigesimal } = calculoService.calcular(
-        fila.correctas, fila.incorrectas, fila.en_blanco, totalPreguntas
+        correctas, incorrectas, en_blanco, totalPreguntas
       );
 
       exitosos.push({
         estudiante_id: estudianteId,
-        correctas: parseInt(fila.correctas),
-        incorrectas: parseInt(fila.incorrectas),
-        en_blanco: parseInt(fila.en_blanco),
+        correctas,
+        incorrectas,
+        en_blanco,
         puntaje_bruto,
         nota_vigesimal
       });

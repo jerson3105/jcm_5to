@@ -108,15 +108,15 @@
         <div class="grid grid-cols-3 gap-2">
           <div>
             <label class="input-label text-center">C</label>
-            <input type="number" name="correctas" class="input-field text-sm text-center" min="0" max="<%= examenActual.total_preguntas %>" value="0" required>
+            <input type="number" name="correctas" id="crear-correctas" class="input-field text-sm text-center" min="0" max="<%= examenActual.total_preguntas %>" value="0" required oninput="calcularBlanco()">
           </div>
           <div>
             <label class="input-label text-center">I</label>
-            <input type="number" name="incorrectas" class="input-field text-sm text-center" min="0" max="<%= examenActual.total_preguntas %>" value="0" required>
+            <input type="number" name="incorrectas" id="crear-incorrectas" class="input-field text-sm text-center" min="0" max="<%= examenActual.total_preguntas %>" value="0" required oninput="calcularBlanco()">
           </div>
           <div>
             <label class="input-label text-center">B</label>
-            <input type="number" name="en_blanco" class="input-field text-sm text-center" min="0" max="<%= examenActual.total_preguntas %>" value="0" required>
+            <input type="number" name="en_blanco" id="crear-blanco" class="input-field text-sm text-center bg-slate-50" min="0" max="<%= examenActual.total_preguntas %>" value="<%= examenActual.total_preguntas %>" readonly>
           </div>
         </div>
         <button type="submit" class="btn-success w-full text-sm">
@@ -433,15 +433,15 @@
                   </div>
                   <div class="flex items-center gap-1">
                     <label class="text-xs font-medium text-emerald-600">C:</label>
-                    <input type="number" name="correctas" value="<%= r.correctas %>" class="input-field w-16 text-sm py-1 text-center" min="0" max="<%= examenActual.total_preguntas %>" required>
+                    <input type="number" name="correctas" value="<%= r.correctas %>" class="input-field w-16 text-sm py-1 text-center edit-correctas" min="0" max="<%= examenActual.total_preguntas %>" required oninput="calcularBlancoEdit(this)">
                   </div>
                   <div class="flex items-center gap-1">
                     <label class="text-xs font-medium text-red-500">I:</label>
-                    <input type="number" name="incorrectas" value="<%= r.incorrectas %>" class="input-field w-16 text-sm py-1 text-center" min="0" max="<%= examenActual.total_preguntas %>" required>
+                    <input type="number" name="incorrectas" value="<%= r.incorrectas %>" class="input-field w-16 text-sm py-1 text-center edit-incorrectas" min="0" max="<%= examenActual.total_preguntas %>" required oninput="calcularBlancoEdit(this)">
                   </div>
                   <div class="flex items-center gap-1">
                     <label class="text-xs font-medium text-slate-400">B:</label>
-                    <input type="number" name="en_blanco" value="<%= r.en_blanco %>" class="input-field w-16 text-sm py-1 text-center" min="0" max="<%= examenActual.total_preguntas %>" required>
+                    <input type="number" name="en_blanco" value="<%= r.en_blanco %>" class="input-field w-16 text-sm py-1 text-center bg-slate-50 edit-blanco" min="0" max="<%= examenActual.total_preguntas %>" readonly>
                   </div>
                   <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-primary-600 hover:bg-primary-700 transition-colors" title="Guardar">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -462,6 +462,25 @@
 </div>
 
 <script>
+var totalPreguntas = <%= examenActual ? examenActual.total_preguntas : 0 %>;
+
+function calcularBlanco() {
+  var c = parseInt(document.getElementById('crear-correctas').value) || 0;
+  var i = parseInt(document.getElementById('crear-incorrectas').value) || 0;
+  var b = totalPreguntas - c - i;
+  if (b < 0) { b = 0; }
+  document.getElementById('crear-blanco').value = b;
+}
+
+function calcularBlancoEdit(input) {
+  var form = input.closest('form');
+  var c = parseInt(form.querySelector('.edit-correctas').value) || 0;
+  var i = parseInt(form.querySelector('.edit-incorrectas').value) || 0;
+  var b = totalPreguntas - c - i;
+  if (b < 0) { b = 0; }
+  form.querySelector('.edit-blanco').value = b;
+}
+
 function editarResultado(id, c, i, b) {
   document.querySelectorAll('.r-view[data-rid="' + id + '"]').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('.r-edit[data-rid="' + id + '"]').forEach(el => el.classList.remove('hidden'));

@@ -467,8 +467,9 @@ function exportarPDF() {
   if (partes.length > 0) { filtrosTexto = partes.join(' | '); }
   document.getElementById('print-filtros').textContent = filtrosTexto;
 
-  // Filtrar filas de la tabla
+  // Filtrar filas de la tabla: ocultar con display:none
   var filas = document.querySelectorAll('.fila-estudiante');
+  var ocultas = [];
   var count = 0;
   filas.forEach(function(fila) {
     var fAreaId = fila.getAttribute('data-area');
@@ -476,11 +477,11 @@ function exportarPDF() {
     var mostrar = true;
     if (areaId && fAreaId !== areaId) { mostrar = false; }
     if (carreraId && fCarreraId !== carreraId) { mostrar = false; }
-    if (mostrar) {
-      fila.classList.remove('print-hidden');
-      count++;
+    if (!mostrar) {
+      fila.style.display = 'none';
+      ocultas.push(fila);
     } else {
-      fila.classList.add('print-hidden');
+      count++;
     }
   });
 
@@ -488,7 +489,13 @@ function exportarPDF() {
 
   // Cerrar modal e imprimir
   document.getElementById('modal-exportar').classList.add('hidden');
-  setTimeout(function() { window.print(); }, 200);
+  setTimeout(function() {
+    window.print();
+    // Restaurar filas ocultas después de imprimir
+    ocultas.forEach(function(fila) {
+      fila.style.display = '';
+    });
+  }, 200);
 }
 
 function filtrarCarrerasExport() {

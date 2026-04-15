@@ -65,13 +65,16 @@ const resultadosController = {
 
   // Carga individual de resultado
   async store(req, res) {
-    const { examen_id, estudiante_id, correctas, incorrectas, en_blanco } = req.body;
+    const { examen_id, estudiante_id, correctas, incorrectas } = req.body;
     try {
       const examen = await Examen.findByPk(examen_id);
       if (!examen) {
         req.session.error = 'Examen no encontrado.';
         return res.redirect('/admin/resultados');
       }
+
+      // Auto-calcular en_blanco
+      const en_blanco = examen.total_preguntas - (parseInt(correctas) || 0) - (parseInt(incorrectas) || 0);
 
       // Verificar duplicado
       const existe = await Resultado.findOne({
@@ -99,7 +102,7 @@ const resultadosController = {
         estudiante_id: parseInt(estudiante_id),
         correctas: parseInt(correctas),
         incorrectas: parseInt(incorrectas),
-        en_blanco: parseInt(en_blanco),
+        en_blanco,
         puntaje_bruto,
         nota_vigesimal
       });
@@ -202,7 +205,7 @@ const resultadosController = {
   // Actualizar un resultado individual
   async update(req, res) {
     const { id } = req.params;
-    const { correctas, incorrectas, en_blanco } = req.body;
+    const { correctas, incorrectas } = req.body;
     try {
       const resultado = await Resultado.findByPk(id, {
         include: [{ association: 'examen' }]
@@ -212,6 +215,9 @@ const resultadosController = {
         req.session.error = 'Resultado no encontrado.';
         return res.redirect('/admin/resultados');
       }
+
+      // Auto-calcular en_blanco
+      const en_blanco = resultado.examen.total_preguntas - (parseInt(correctas) || 0) - (parseInt(incorrectas) || 0);
 
       const validacion = calculoService.validarFila(correctas, incorrectas, en_blanco, resultado.examen.total_preguntas);
       if (!validacion.ok) {
@@ -226,7 +232,7 @@ const resultadosController = {
       await resultado.update({
         correctas: parseInt(correctas),
         incorrectas: parseInt(incorrectas),
-        en_blanco: parseInt(en_blanco),
+        en_blanco,
         puntaje_bruto,
         nota_vigesimal
       });
@@ -270,9 +276,9 @@ const resultadosController = {
       const wb = XLSX.utils.book_new();
 
       // Encabezados + datos de estudiantes
-      const datos = [['dni', 'nombre', 'correctas', 'incorrectas', 'en_blanco']];
+      const datos = [['dni', 'nombre', 'correctas', 'incorrectas']];
       estudiantes.forEach(est => {
-        datos.push([est.dni, est.usuario.nombre, '', '', '']);
+        datos.push([est.dni, est.usuario.nombre, '', '']);
       });
 
       const ws = XLSX.utils.aoa_to_sheet(datos);
@@ -280,8 +286,7 @@ const resultadosController = {
         { wch: 15 },  // dni
         { wch: 35 },  // nombre
         { wch: 12 },  // correctas
-        { wch: 12 },  // incorrectas
-        { wch: 12 }   // en_blanco
+        { wch: 12 }   // incorrectas
       ];
       XLSX.utils.book_append_sheet(wb, ws, seccion.nombre);
 
